@@ -1,21 +1,20 @@
-// components/HistoryProvider.tsx
+// providers/HistoryProvider.tsx
 'use client';
 
 import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
+// ⚠️ You will need to create the file '@/types/history' based on our previous steps
 import { Artwork, HistoryContextType } from '@/types/history'; 
-import { notFound } from 'next/navigation';
 
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined);
 
-// The initial implementation uses the rich data, as intended.
 export function HistoryProvider({ 
     children, 
     initialArtworks 
 }: { 
     children: ReactNode; 
-    initialArtworks: Artwork[]; // Expects the full, rich data array
+    initialArtworks: Artwork[]; // The rich data fetched server-side
 }) {
-  const [artworks, setArtworks] = useState(initialArtworks);
+  const [artworks] = useState(initialArtworks);
   const [selectedArtworkId, setSelectedArtworkId] = useState<number | null>(null);
 
   // Memoize the utility function to look up an artwork by slug
@@ -37,10 +36,11 @@ export function HistoryProvider({
   );
 }
 
-// Custom hook to consume the context
+// Custom hook to consume the context (used in Artworks.tsx)
 export function useHistory() {
   const context = useContext(HistoryContext);
   if (context === undefined) {
+    // This is the error message that would fire if Artworks.tsx is not wrapped by the Provider
     throw new Error('useHistory must be used within a HistoryProvider');
   }
   return context;

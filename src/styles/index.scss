@@ -1,1 +1,7 @@
+@use 'vars.scss' as *;
+
+// components
+@use 'artworks.scss';
+@use 'loading.scss';
+
 @import 'modern-normalize/modern-normalize.css';
