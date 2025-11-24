@@ -1,0 +1,40 @@
+{
+  "common": {
+    "cart": "Cart",
+    "search": "Search",
+    "account": "Account",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+    "aColorfulHistory" : "a colorful history",
+    "about" : "About",
+    "contact" : "Contact",
+    "artPrints" : "Art Prints",
+    "theGatesOfPerception" : "the Gates of Perception",
+    "mediumsOfWar" : "Mediums of War",
+    "augmentedReality" : "Augmented Reality - AR",
+    "filterArtworks" : "Filter Artworks",
+    "sortBy" : "Sort By",
+    "availableArtworks" : "Available Artworks",
+    "clickToViewLarger" : "Click to view larger",
+    "map" : "Map",
+    "list" : "List",
+    "filterAndSort" : "filter & sort",
+    "filter" : "filter",
+    "sort" : "sort",
+    "latest" : "latest",
+    "oldest" : "oldest",
+    "random" : "random",
+    "minimize" : "minimize",
+    "paintingPhotographyAndHistory" : "Painting, Photography and History",
+    "by" : "by",
+    "AR": {
+        "title": "View in AR",
+        "start": "Start AR Experience",
+        "loading": "Loading 3D Model...",
+        "error": "AR not supported. Use a modern browser.",
+        "video1": "Play Video A",
+        "video2": "Play Video B",
+        "video3": "Play Video C"
+    }
+}

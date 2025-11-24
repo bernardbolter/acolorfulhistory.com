@@ -1,0 +1,40 @@
+{
+  "common": {
+    "cart": "Warenkorb",
+    "search": "Suchen",
+    "account": "Konto",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden"
+  },
+  "aColorfulHistory" : "eine farbenfrohe Geschichte",
+    "about" : "Über",
+    "contact" : "Kontakt",
+    "artPrints" : "Kunstdrucke",
+    "theGatesOfPerception" : "die Tore der Wahrnehmung",
+    "mediumsOfWar" : "Medien des Krieges",
+    "augmentedReality" : "Augmented Reality - AR",
+    "filterArtworks" : "Kunstwerke filtern",
+    "sortBy" : "Sortieren nach",
+    "availableArtworks" : "Verfügbare Kunstwerke",
+    "clickToViewLarger" : "Für eine größere Ansicht anklicken",
+    "map" : "Karte",
+    "list" : "Liste",
+    "filterAndSort" : "filtern & sortieren",
+    "filter" : "filtern",
+    "sort" : "sortieren",
+    "latest" : "neueste",
+    "oldest" : "älteste",
+    "random" : "zufällig",
+    "minimize" : "minimieren",
+    "paintingPhotographyAndHistory" : "Malerei, Fotografie und Geschichte",
+    "by" : "von",
+    "AR": {
+        "title": "In AR ansehen",
+        "start": "AR-Erlebnis starten",
+        "loading": "3D-Modell laden...",
+        "error": "AR nicht unterstützt. Verwenden Sie einen modernen Browser.",
+        "video1": "Video A abspielen",
+        "video2": "Video B abspielen",
+        "video3": "Video C abspielen"
+    }
+}
