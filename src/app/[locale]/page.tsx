@@ -1,20 +1,16 @@
-import {getTranslations} from 'next-intl/server'
-
 import Logo from '@/components/navigation/Logo'
-import Artworks from '@/components/artwork/Artworks'
+import Nav from '@/components/navigation/Nav'
+import Hero from '@/components/home/Hero'
+import AllArtwork from '@components/home/AllArtwork';
 
-export default async function Page({params}: {params: Promise<{locale: string}>}) {
-  const {locale} = await params;
-  const t = await getTranslations(); // ← async/await
-  // console.log(t('aColorfulHistory'))
-
+export default async function Page() {
 
   return (
     <main>
       <Logo />
-      <Artworks />
-      <h1>{t('about')}</h1>
-      <p>Locale: {locale}</p>
+      <Nav />
+      <Hero />
+      <AllArtwork />
     </main>
   );
 }

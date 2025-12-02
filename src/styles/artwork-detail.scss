@@ -1,0 +1,101 @@
+@use 'vars.scss' as *;
+
+.artwork-detail-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: $less-dark;
+
+  .artwork-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-top: 2rem;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .artwork-image {
+      position: relative;
+      width: 100%;
+      
+      img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+      }
+    }
+
+    .artwork-info {
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: $text;
+      }
+
+      .artwork-metadata {
+        margin-bottom: 2rem;
+
+        .metadata-item {
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: baseline;
+          gap: 1rem;
+
+          .label {
+            font-weight: 600;
+            color: $text-light;
+            min-width: 80px;
+          }
+
+          .value {
+            color: $text;
+          }
+        }
+      }
+
+      .artwork-description {
+        margin-bottom: 2rem;
+        color: $text;
+        line-height: 1.6;
+
+        p {
+          margin-bottom: 1rem;
+        }
+      }
+
+      .artwork-sale {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        .for-sale-badge {
+          display: inline-block;
+          background: $accent;
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          margin-bottom: 1rem;
+        }
+
+        .purchase-link {
+          display: inline-block;
+          background: $text;
+          color: $background;
+          padding: 1rem 2rem;
+          border-radius: 8px;
+          text-decoration: none;
+          font-weight: 600;
+          transition: background-color 0.2s ease-in-out;
+
+          &:hover {
+            background: lighten($text, 10%);
+          }
+        }
+      }
+    }
+  }
+} 

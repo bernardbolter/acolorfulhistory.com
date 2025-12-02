@@ -6,6 +6,7 @@ import { getBaseURL } from '@/lib/util/env'
 import { getAllArtworks } from '@/lib/api'
 import { HistoryProvider } from '@/providers/HistoryProvider'
 import '@/styles/globals.css'
+import '@/styles/index.scss'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {

@@ -1,0 +1,195 @@
+@use 'vars.scss' as *;
+
+.map-wrap {
+    width: 100%;
+    height: 100vh;
+    background: $less-dark;
+    display: flex;
+}
+
+.map-container {
+    width: 100%;
+    height: 100vh;
+}
+
+.leaflet-container {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    left: 0;
+}
+
+.map {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.map-pop-single-container {
+    height: 115px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    img {
+        position: relative;
+    }
+
+    p {
+        font-size: 10px;
+        color: $dark-fill;
+        padding: 1px 0 0 0;
+        font-weight: 500;
+    }
+}
+
+.map-single-pop-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    z-index: 301;
+    opacity: 0;
+    transition: opacity .5s ease-in-out;
+    cursor: pointer;
+    background: rgba(255,255,255,.8);
+    font-weight: 800;
+    font-size: 10px;
+    color: $dark-fill;
+
+    &:hover {
+        opacity: 1;
+        transition: opacity .5s ease-in-out;
+    }
+
+    svg {
+        width: 70%;
+        height: 70%;
+        fill: $filter-dark;
+    }
+}
+
+.mapboxgl-popup-content {
+    padding: 5px !important;
+    box-shadow: 4px 6px 4px rgba(0,0,0,.1) !important;
+
+}
+
+.map-pop-multiple-container {
+    height: 120px;
+    overflow: hidden;
+}
+
+.map-pop-multiple-inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    transition: transform .5s ease-in-out;
+}
+
+.map-pop-multiple-art {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    img {
+        position: relative;
+    }
+
+    p {
+        font-size: 10px;
+        color: $dark-fill;
+        padding: 3px 0 0 0;
+        font-weight: 500;
+    }
+}
+
+.map-pop-multiple-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    z-index: 301;
+    opacity: 0;
+    transition: opacity .5s ease-in-out;
+    cursor: pointer;
+    background: rgba(255,255,255,.8);
+    font-weight: 800;
+    font-size: 10px;
+    color: $dark-fill;
+    top: 0;
+
+    svg {
+        width: 75%;
+        height: 75%;
+        fill: $filter-dark;
+    }
+
+    &:hover {
+        opacity: 1;
+        transition: opacity .5s ease-in-out;
+    }
+}
+
+.map-marker-left-container {
+    position: absolute;
+    left: -35px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+
+    svg {
+        width: 10px;
+        height: 10px;
+        fill: $dark-fill;
+        transform: rotate(180deg);
+    }
+}
+
+.map-marker-right-container {
+    position: absolute;
+    right: -35px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+
+    svg {
+        width: 10px;
+        height: 10px;
+        fill: $dark-fill;
+    }
+}
+
+.marker-nav-disabled {
+    opacity: .2;
+}
+
+.map-pop-enlarge-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: green;
+    padding: 13px 5px;
+    box-sizing: content-box;
+}

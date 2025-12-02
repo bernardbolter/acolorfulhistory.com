@@ -22,6 +22,7 @@ export type Artwork = {
 
   city: string;
   country: string;
+  date: string;
   location: string;
   medium: string;
   style: string;
@@ -31,7 +32,8 @@ export type Artwork = {
   price: number;
   size: string;
   units: string;
-  physicalWidth: number;
+  height: number;
+  width: number;
   forSale: boolean;
   metaDescription: string;
   metaKeywords: string;

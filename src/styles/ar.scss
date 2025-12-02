@@ -1,0 +1,233 @@
+@use 'vars.scss' as *;
+
+.artwork-ar-page {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.artwork-ar-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  color: #fff;
+}
+
+.ar-navigation {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  
+  .back-to-artwork-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.ar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.ar-preview {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  
+  .ar-artwork-info {
+    margin-bottom: 30px;
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+      font-weight: 300;
+    }
+    
+    .artwork-details {
+      p {
+        margin: 5px 0;
+        opacity: 0.8;
+        font-size: 1.1em;
+      }
+    }
+  }
+  
+  .ar-artwork-image {
+    margin-bottom: 30px;
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .ar-instructions {
+    margin-bottom: 30px;
+    
+    h2 {
+      font-size: 2em;
+      margin-bottom: 15px;
+      font-weight: 300;
+    }
+    
+    p {
+      font-size: 1.1em;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 25px;
+    }
+    
+    .start-ar-button {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+      border: none;
+      color: #fff;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1.2em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+      
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(255, 107, 107, 0.4);
+      }
+    }
+  }
+  
+  .ar-story {
+    text-align: left;
+    margin-top: 40px;
+    
+    h3 {
+      font-size: 1.5em;
+      margin-bottom: 15px;
+      font-weight: 400;
+    }
+    
+    p, div {
+      line-height: 1.6;
+      opacity: 0.9;
+      font-size: 1em;
+    }
+  }
+}
+
+.ar-experience {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  
+  .ar-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    
+    .stop-ar-button {
+      background: rgba(255, 0, 0, 0.8);
+      border: none;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(255, 0, 0, 1);
+        transform: translateY(-2px);
+      }
+    }
+  }
+  
+  .ar-viewer {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .ar-placeholder {
+      text-align: center;
+      opacity: 0.7;
+      
+      p {
+        font-size: 1.2em;
+        margin: 10px 0;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .ar-preview {
+    padding: 20px;
+    
+    .ar-artwork-info h1 {
+      font-size: 2em;
+    }
+    
+    .ar-instructions {
+      h2 {
+        font-size: 1.5em;
+      }
+      
+      p {
+        font-size: 1em;
+      }
+      
+      .start-ar-button {
+        padding: 12px 25px;
+        font-size: 1em;
+      }
+    }
+  }
+  
+  .ar-navigation {
+    top: 10px;
+    left: 10px;
+    
+    .back-to-artwork-button {
+      padding: 10px 15px;
+      font-size: 12px;
+    }
+  }
+  
+  .ar-controls {
+    top: 10px;
+    right: 10px;
+    
+    .stop-ar-button {
+      padding: 10px 15px;
+      font-size: 12px;
+    }
+  }
+}

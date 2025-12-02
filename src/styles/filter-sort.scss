@@ -1,0 +1,94 @@
+@use 'vars.scss' as *;
+
+.filter-sort-container {
+    position: fixed;
+    z-index: 300;
+    right: 0px;
+}
+
+.filter-sort-tab {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-top-left-radius: 10px;
+    background: $nav-background;
+    padding: 3px 10px;
+    cursor: pointer;
+
+    p {
+        font-size: 11px;
+        color: $filter-dark;
+        font-weight: 700;
+        padding: 0 3px;
+    }
+
+    svg {
+        width: 15px;
+        height: 15px;
+        fill: $filter-dark;
+    }
+}
+
+.filter-sort-toggle-svg {
+    width: 15px;
+    height: 15px;
+    fill: $filter-dark;
+}
+
+.filter-line {
+    width: 100%;
+    height: 1px;
+    background: $filter-dark;
+}
+
+.filter-content {
+    max-height: 0;
+    transition: all .5s ease-in-out;
+    background: $nav-background;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding: 0 9px;
+    transition: all .7s linear;
+}
+
+.filter-content-open {
+    max-height: 800px;
+    transition: all .7s linear;
+}
+
+.filter-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: $filter-dark;
+    padding: 7px 0 3px 0;
+}
+
+.filter-city {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: pointer;
+
+    p {
+        font-size: 14px;
+        font-weight: 500;
+        color: $dark-fill;
+        padding: 3px 7px 0 0;
+    }
+
+    .filter-checkbox {
+        width: 12px;
+        height: 12px;
+        border: 1px solid $filter-dark;
+        padding: 3px;
+    }
+}
+
+.filter-city-bottom-margin {
+    padding-bottom: 7px;
+}

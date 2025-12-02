@@ -1,0 +1,43 @@
+@use 'vars.scss' as *;
+
+.logo {
+    width: 200px;
+    position: fixed;
+    z-index: 200;
+    top: 20px;
+    left: 20px;
+    transition: left $fast;
+    color: #666;
+
+    svg {
+        width: 100%;
+    }
+}
+
+.logo-menu-open {
+    @media (min-width: $desktop) {
+        left: calc(100% - 270px);
+        transition: left $fast;
+    }
+}
+
+.logo-tageline {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 400;
+    color: $dark;
+    opacity: .8;
+    transition: opacity $fast;
+}
+
+.logo-tageline-name {
+    font-weight: 800;
+    font-size: 8px;
+    color: $dark-fill;
+}
+
+.logo-tageline-on {
+    opacity: .3;
+    transition: opacity $fast;
+}

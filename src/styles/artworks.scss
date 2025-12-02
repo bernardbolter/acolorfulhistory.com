@@ -1,0 +1,10 @@
+@use 'vars.scss' as *;
+
+.artworks-container {
+    width: 100%;
+    height: 100vh;
+    background: $background;
+    display: flex;
+    position: fixed;
+    z-index: 1;
+}

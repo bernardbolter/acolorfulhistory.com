@@ -1,14 +1,18 @@
 'use client'
 
 import { useHistory } from "@/providers/HistoryProvider"
+import ColorLogo from '@/svg/colorLogo'
+import { useTranslations } from "next-intl"
 
 const Logo = () => {
-    const { artworks } = useHistory()
-    console.log(artworks)
+    const [ history ] = useHistory()
+    const t = useTranslations()
 
     return (
-        <div className="logo__container">
-            <p>Logo</p>
+        <div className={history.navOpen ? 'logo logo-menu-open' : 'logo'}>
+            <ColorLogo />
+            <p className='logo-tageline'>{t('paintingPhotographyAndHistory')}</p>
+            <p className="logo-tageline-name">{t('by')} <b>Bernard Bolter</b></p>
         </div>
     )
 }

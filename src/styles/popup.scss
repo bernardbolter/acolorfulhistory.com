@@ -1,0 +1,10 @@
+@use 'vars.scss' as *;
+
+.popup-container {
+    z-index: 4000;
+    display: flex;
+    width: 80%;
+    height: 80%;
+    margin: 10%;
+    background: grey;
+}
