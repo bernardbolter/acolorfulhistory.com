@@ -1,9 +1,12 @@
+import Logo from "@/components/navigation/Logo"
+import Nav from "@/components/navigation/Nav"
 import Artworks from "@/components/artwork/Artworks"
 
 export default function ArtworkPage() {
     return (
         <section>
-            <h1>Artwork</h1>
+            <Logo />
+            <Nav />
             <Artworks />
         </section>
     )

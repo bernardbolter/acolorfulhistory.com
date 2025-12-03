@@ -6,8 +6,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { Map as LibreMap, Marker, Popup } from '@vis.gl/react-maplibre'
+import { MapRef, Map as LibreMap, Marker, Popup } from '@vis.gl/react-maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import type { Map as MapLibreMapInstance } from 'maplibre-gl'
 
 import MapNav from '@/components/artwork/map/MapNav'
 
@@ -21,53 +22,7 @@ import 'react-medium-image-zoom/dist/styles.css'
 import { interpolate } from '@/helpers/helpers'
 import { triggerArtworkAnimation } from '@/helpers/animation'
 
-// Types for better type safety
-interface ArtworkFields {
-  lat: number
-  lng: number
-  proportion: number
-  city?: string
-  country?: string
-  forsale?: boolean
-  height?: number
-  medium?: string
-  metadescription?: string
-  metakeywords?: string
-  orientation?: string
-  series?: string
-  size?: string
-  style?: string
-  width?: number
-  year?: string | number
-  artworklink?: {
-    url: string
-    title: string
-  }
-  artworkImage?: {
-    mediaDetails: {
-      sizes: Array<{ sourceUrl: string; width: number; height: number }>
-      width: number
-      height: number
-    }
-    mediaItemUrl: string
-  }
-}
-
-interface Artwork {
-  slug: string
-  title: string
-  artworkFields: ArtworkFields
-  content?: string
-  databaseId?: number
-  id?: string
-  date?: string
-  featuredImage?: {
-    node?: {
-      sourceUrl?: string
-      altText?: string
-    }
-  }
-}
+import { Artwork } from '@/types/history'
 
 interface MarkerGroup {
   artworks: Artwork[]
@@ -75,9 +30,15 @@ interface MarkerGroup {
   lng: number
 }
 
+const getProportion = (artwork: Artwork): number => {
+  return artwork.image.width && artwork.image.height
+    ? artwork.image.height / artwork.image.width
+    : 1
+}
+
 const ArtworkMap = () => {
   const [history, setHistory] = useHistory()
-  const mapRef = useRef(null)
+  const mapRef = useRef<MapRef | null>(null)
   const router = useRouter()
   console.log(history.filtered)
 
@@ -98,14 +59,14 @@ const ArtworkMap = () => {
 
     // Filter artworks that have location data
     const placedArtworks = history.filtered.filter(
-      artwork => artwork.artworkFields.lat && artwork.artworkFields.lng
+      artwork => artwork.lat && artwork.lng
     )
 
     // Group by location
     const locationGroups = new Map<string, Artwork[]>()
     
     placedArtworks.forEach(artwork => {
-      const locationKey = `${artwork.artworkFields.lat},${artwork.artworkFields.lng}`
+      const locationKey = `${artwork.lat},${artwork.lng}`
       if (!locationGroups.has(locationKey)) {
         locationGroups.set(locationKey, [])
       }
@@ -115,8 +76,8 @@ const ArtworkMap = () => {
     // Convert to MarkerGroup format
     const groups: MarkerGroup[] = Array.from(locationGroups.entries()).map(([locationKey, artworks]) => ({
       artworks,
-      lat: artworks[0].artworkFields.lat,
-      lng: artworks[0].artworkFields.lng,
+      lat: artworks[0].lat,
+      lng: artworks[0].lng,
     }))
 
     setMarkerGroups(groups)
@@ -180,7 +141,7 @@ const ArtworkMap = () => {
 
   // Calculate total width for carousel
   const getTotalWidth = useCallback((artworks: Artwork[]) => {
-    return artworks.reduce((total, artwork) => total + (100 * artwork.artworkFields.proportion), 0)
+    return artworks.reduce((total, artwork) => total + (100 * getProportion(artwork)), 0)
   }, [])
 
   // Calculate transform offset for carousel
@@ -190,7 +151,7 @@ const ArtworkMap = () => {
     
     let offset = 0
     for (let i = 0; i < currentIndex; i++) {
-      offset -= 100 * group.artworks[i].artworkFields.proportion
+      offset -= 100 * getProportion(group.artworks[i])
     }
     return offset
   }, [multipleMarkerIndices])
@@ -199,8 +160,8 @@ const ArtworkMap = () => {
   const SingleMarker: React.FC<{ artwork: Artwork }> = ({ artwork }) => (
     <div className="map-marker-container" key={artwork.slug}>
       <Marker
-        longitude={artwork.artworkFields.lng}
-        latitude={artwork.artworkFields.lat}
+        longitude={artwork.lng}
+        latitude={artwork.lat}
         anchor="bottom"
         onClick={(e) => {
           e.originalEvent.stopPropagation()
@@ -212,8 +173,8 @@ const ArtworkMap = () => {
       </Marker>
       {history.popupOpen === artwork.slug && (
         <Popup
-          longitude={artwork.artworkFields.lng}
-          latitude={artwork.artworkFields.lat}
+          longitude={artwork.lng}
+          latitude={artwork.lat}
           onClose={() => setHistory(state => ({ ...state, popupOpen: '' }))}
           closeButton={false}
           offset={25}
@@ -226,9 +187,10 @@ const ArtworkMap = () => {
               onZoomChange={(shouldZoom) => handleZoomChange(shouldZoom, artwork.slug)}
             >
               <img 
-                src={artwork.artworkFields.artworkImage?.mediaDetails.sizes[1].sourceUrl} 
+                src={artwork.image.sourceUrl} 
                 alt={`Artwork: ${artwork.title}`}
-                width={100 * artwork.artworkFields.proportion}
+                sizes="100px"
+                width={100 * getProportion(artwork)}
                 height={100}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -286,7 +248,7 @@ const ArtworkMap = () => {
             <div 
               className="map-pop-multiple-container"
               style={{
-                width: 100 * currentArtwork.artworkFields.proportion
+                width: 100 * getProportion(currentArtwork)
               }}   
             >
               {/* Navigation buttons */}
@@ -316,7 +278,7 @@ const ArtworkMap = () => {
                     key={artwork.slug}
                     className="map-pop-multiple-art"
                     style={{
-                      width: 100 * artwork.artworkFields.proportion,
+                      width: 100 * getProportion(artwork),
                     }}
                     onClick={() => {
                       console.log('clicked multiple')
@@ -327,9 +289,10 @@ const ArtworkMap = () => {
                     }}
                   >
                     <Image
-                      src={artwork.artworkFields.artworkImage?.mediaDetails.sizes[1].sourceUrl || ''}
+                      src={artwork.image.sourceUrl || ''}
                       alt={`thumbnail image of ${artwork.title}`}
-                      width={100 * artwork.artworkFields.proportion}
+                      sizes="100px"
+                      width={100 * getProportion(artwork)}
                       height={100}
                       // onClick={(e) => {
                       //   e.stopPropagation()
@@ -350,7 +313,7 @@ const ArtworkMap = () => {
                     <div 
                       className="map-pop-multiple-overlay"
                       style={{
-                        width: 100 * artwork.artworkFields.proportion,
+                        width: 100 * getProportion(artwork),
                         height: 100
                       }}
                       // onClick={(e) => {
@@ -396,12 +359,19 @@ const ArtworkMap = () => {
 
   // Fly to artwork location
   useEffect(() => {
-    if (history.currentMapArtwork && mapRef.current) {
-      mapRef.current.flyTo({ 
-        center: [history.currentMapArtwork.artworkFields.lng, history.currentMapArtwork.artworkFields.lat] 
-      })
+    // Check if the artwork exists AND if both lat and lng are valid numbers.
+    if (
+        history.currentMapArtwork && 
+        history.currentMapArtwork.lng !== undefined && 
+        history.currentMapArtwork.lat !== undefined && 
+        mapRef.current
+    ) {
+        mapRef.current.flyTo({ 
+            center: [history.currentMapArtwork.lng, history.currentMapArtwork.lat],
+            zoom: 15, // Optional: Add a standard zoom level for a smooth transition
+        });
     }
-  }, [history.currentMapArtwork])
+}, [history.currentMapArtwork]);
 
   // Handle map zoom for marker scaling
   const onZoom = useCallback((e: any) => {

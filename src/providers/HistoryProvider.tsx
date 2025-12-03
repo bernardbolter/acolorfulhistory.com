@@ -130,12 +130,9 @@ export const HistoryProvider = ({ children, initialArtworks = [] }: HistoryProvi
 
     let filtered = [...history.original]
 
-    // Apply city filter
-    if (history.checked.length > 0) {
-      filtered = filtered.filter(art => 
-        history.checked.includes(art.city || '')
-      )
-    }
+    filtered = filtered.filter(art => art.image.sourceUrl)
+
+    console.log(filtered)
 
     // Apply sorting
     if (history.sorting === 'latest') {
