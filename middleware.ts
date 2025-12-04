@@ -1,4 +1,4 @@
-// middleware.ts (project root — replace the whole file)
+// middleware.ts (project root)
 import { NextRequest, NextResponse } from "next/server"
 import createMiddleware from "next-intl/middleware"
 import { routing } from "./src/i18n/routing"
@@ -45,7 +45,7 @@ async function getRegionMap() {
 
 async function handleMedusaRegion(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-  const segments = pathname.split("/").filter(Boolean) // ["en","store","us","cart"] → ["en","store","us","cart"]
+  const segments = pathname.split("/").filter(Boolean)
 
   // Only run Medusa logic if we're inside /store
   if (segments[1] !== "store") {
@@ -72,7 +72,7 @@ async function handleMedusaRegion(request: NextRequest) {
   } else if (regionMap.has(defaultCountry)) {
     targetCountry = defaultCountry
   } else if (regionMap.keys().next().value) {
-    targetCountry = regionMap.keys().next().value as string   // ← safe cast
+    targetCountry = regionMap.keys().next().value as string
   }
 
   // Redirect to correct country
@@ -89,6 +89,7 @@ export async function middleware(request: NextRequest) {
   if (medusaResponse) return medusaResponse
 
   // Then: let next-intl handle locale detection/redirects
+  // This will properly handle /[locale]/artwork/[slug] routes
   return intlMiddleware(request)
 }
 

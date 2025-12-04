@@ -1,3 +1,5 @@
+// types/graphql.ts
+
 export interface GraphQLArtworkNode {
   databaseId: number;
   slug: string;
@@ -7,6 +9,8 @@ export interface GraphQLArtworkNode {
   artworkFields: {
     location: string | null;
     artworkImage: { node?: RawImageNode | null } | null;
+    artworkImageThumb: { node?: RawImageNode | null } | null;
+    artworkImageLarge: { node?: RawImageNode | null } | null;
     city: string | null;
     country: string | null;
     coordinates: string | null;
@@ -34,23 +38,24 @@ export interface GraphQLArtworkNode {
     storyEn: string | null;
     wikiLinkDe: string | null;
     wikiLinkEn: string | null;
-    // MAKING ASSETS
-    makingColor: string | null;
-    makingIcon: { node?: RawImageNode | null | undefined; } | null;
-    makingVideoFile: { mediaItemUrl?: string | null; } | null; // Use mediaItemUrl for file type
-    makingPosterImage: { node?: RawImageNode | null | undefined; } | null;
-
-    // HISTORY ASSETS
-    historyColor: string | null;
-    historyIcon: { node?: RawImageNode | null | undefined; } | null;
-    historyVideoFile: { mediaItemUrl?: string | null; } | null;
-    historyPosterImage: { node?: RawImageNode | null | undefined; } | null;
     
-    // FREESTYLE ASSETS
+    // MAKING ASSETS (corrected field names with node wrapper)
+    makingColor: string | null;
+    makingIcon: { node?: RawImageNode | null } | null;
+    makingVideo: { node?: { mediaItemUrl?: string | null } | null } | null;
+    makingPoster: { node?: RawImageNode | null } | null;
+
+    // HISTORY ASSETS (corrected field names with node wrapper)
+    historyColor: string | null;
+    historyIcon: { node?: RawImageNode | null } | null;
+    historyVideo: { node?: { mediaItemUrl?: string | null } | null } | null;
+    historyPoster: { node?: RawImageNode | null } | null;
+    
+    // FREESTYLE ASSETS (corrected field names with node wrapper)
     freestyleColor: string | null;
-    freestyleIcon: { node?: RawImageNode | null | undefined; } | null;
-    freestyleVideoFile: { mediaItemUrl?: string | null; } | null;
-    freestylePosterImage: { node?: RawImageNode | null | undefined; } | null;
+    freestyleIcon: { node?: RawImageNode | null } | null;
+    freestyleVideo: { node?: { mediaItemUrl?: string | null } | null } | null;
+    freestylePoster: { node?: RawImageNode | null } | null;
   } | null;
 }
 

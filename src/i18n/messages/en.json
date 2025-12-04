@@ -28,6 +28,7 @@
     "minimize" : "minimize",
     "paintingPhotographyAndHistory" : "Painting, Photography and History",
     "by" : "by",
+    "viewInAR" : "view in AR",
     "AR": {
         "title": "View in AR",
         "start": "Start AR Experience",
