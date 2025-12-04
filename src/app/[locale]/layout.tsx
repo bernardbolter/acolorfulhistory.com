@@ -13,10 +13,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
 }
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }))
-}
-
 export default async function LocaleLayout({
   children,
   params,
