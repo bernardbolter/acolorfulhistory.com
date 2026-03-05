@@ -1,7 +1,16 @@
-import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin'
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const withNextIntl = createNextIntlPlugin()
+
+const nextConfig = {
+    images: {
+    remotePatterns: [
+      {
+        protocol: 'https' as const,
+        hostname: 'artism.org',
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig)

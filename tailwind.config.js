@@ -1,0 +1,48 @@
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./providers/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        red: 'var(--red)',
+        'red-orange': 'var(--red-orange)',
+        orange: 'var(--orange)',
+        'orange-yellow': 'var(--orange-yellow)',
+        yellow: 'var(--yellow)',
+        'yellow-olive': 'var(--yellow-olive)',
+        olive: 'var(--olive)',
+        'olive-green': 'var(--olive-green)',
+        green: 'var(--green)',
+        'green-aqua': 'var(--green-aqua)',
+        aqua: 'var(--aqua)',
+        'aqua-cobalt': 'var(--aqua-cobalt)',
+        cobalt: 'var(--cobalt)',
+        'cobalt-blue': 'var(--cobalt-blue)',
+        blue: 'var(--blue)',
+        'blue-purple': 'var(--blue-purple)',
+        purple: 'var(--purple)',
+        dark: 'var(--dark)',
+        'nav-background': 'var(--nav-background)',
+        background: 'var(--background)',
+        'light-dark': 'var(--light-dark)',
+        'dark-fill': 'var(--dark-fill)',
+        'filter-dark': 'var(--filter-dark)',
+        'art-list-background': 'var(--art-list-background)',
+        'menu-color': 'var(--menu-color)',
+        'error-red': 'var(--error-red)',
+        'less-dark': 'var(--less-dark)',
+        'pin-color': 'var(--pin-color)',
+        text: 'var(--text)',
+        'text-light': 'var(--text-light)',
+        accent: 'var(--accent)',
+        'accent-light': 'var(--accent-light)',
+      },
+    },
+  },
+  plugins: [],
+}
