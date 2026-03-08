@@ -1,4 +1,11 @@
+"use client"
+
 import Image from 'next/image'
+import Link from 'next/link'
+import { useLocale } from 'next-intl'
+
+import ARsvg from '@/svgs/ARsvg'
+
 import { Artwork } from '@/types'
 
 interface Props {
@@ -7,6 +14,8 @@ interface Props {
 
 export default function ArtworkSlug({ artwork }: Props) {
   const { artworkFields, title, content } = artwork
+  const locale = useLocale()
+
   const imageUrl = artworkFields.artworkImage?.mediaItemUrl
 
   return (
@@ -47,6 +56,13 @@ export default function ArtworkSlug({ artwork }: Props) {
               className="mt-4 text-stone-600 font-light leading-relaxed text-sm"
               dangerouslySetInnerHTML={{ __html: content }}
             />
+          )}
+        </div>
+        <div className="size-20">
+          {artwork.colorfulFields?.ar && (
+            <Link href={`/${locale}/${artwork.slug}/ar`}>
+              <ARsvg />
+            </Link>
           )}
         </div>
       </div>

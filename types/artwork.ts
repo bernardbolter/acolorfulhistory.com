@@ -41,12 +41,29 @@ export interface ArtworkFields {
     year: number;
 }
 
+export interface ARMediaNode {
+  node?: {
+    uri?: string
+  }
+}
+
+export interface ARExperience {
+  color?: string
+  icon?: ARMediaNode
+  poster?: ARMediaNode
+  video?: ARMediaNode
+}
+
 export interface ColorfulFields {
-    ar?: string;
-    storyDe?: string;
-    storyEn?: string;
-    wikiLinkDe?: string;
-    wikiLinkEn?: string;
+  ar?: boolean
+  mind?: ARMediaNode
+  freestyle?: ARExperience
+  making?: ARExperience
+  history?: ARExperience
+  storyDe?: string
+  storyEn?: string
+  wikiLinkDe?: string
+  wikiLinkEn?: string
 }
 
 export interface FeaturedImage {

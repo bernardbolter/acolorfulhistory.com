@@ -103,11 +103,64 @@ export const getArtworkBySlugQuery = `
                 year
             }
             colorfulFields {
-                wikiLinkEn
-                wikiLinkDe
-                storyEn
-                storyDe
+                mind {
+                    node {
+                        uri
+                    }
+                }
+                freestyleColor
+                freestyleIcon {
+                    node {
+                        uri
+                    }
+                }
+                freestylePoster {
+                    node {
+                        uri
+                    }
+                }
                 ar
+                freestyleVideo {
+                    node {
+                        uri
+                    }
+                }
+                historyColor
+                historyIcon {
+                    node {
+                        uri
+                    }
+                }
+                historyPoster {
+                    node {
+                        uri
+                    }
+                }
+                historyVideo {
+                node {
+                    uri
+                }
+                }
+                makingColor
+                makingIcon {
+                    node {
+                        uri
+                    }
+                }
+                makingPoster {
+                    node {
+                        uri
+                    }
+                }
+                makingVideo {
+                    node {
+                        uri
+                    }
+                }
+                storyDe
+                storyEn
+                wikiLinkDe
+                wikiLinkEn
             }
             title(format: RENDERED)
             content(format: RENDERED)

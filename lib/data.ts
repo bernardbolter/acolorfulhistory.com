@@ -1,6 +1,15 @@
 import { getAllArtwork, getArtworkBySlugQuery } from '@/lib/graphql'
 import { Artwork } from '@/types'
 
+function mapARExperience(fields: any, prefix: string) {
+  return {
+    color: fields?.[`${prefix}Color`] || '',
+    icon: { node: { uri: fields?.[`${prefix}Icon`]?.node?.uri || '' } },
+    poster: { node: { uri: fields?.[`${prefix}Poster`]?.node?.uri || '' } },
+    video: { node: { uri: fields?.[`${prefix}Video`]?.node?.uri || '' } },
+  }
+}
+
 export async function getArtworksLite(): Promise<Artwork[]> {
   const graphqlUrl = process.env.GRAPHQL_URL || process.env.NEXT_PUBLIC_GRAPHQL_URL;
 
@@ -120,6 +129,16 @@ export async function getArtworkBySlug(slug: string): Promise<Artwork | null> {
         mediaItemUrl: art.artworkFields.artworkImage.node.mediaItemUrl || ''
       } : undefined,
     },
-    colorfulFields: art.colorfulFields,
+    colorfulFields: {
+      ar: art.colorfulFields?.ar || false,
+      mind: { node: { uri: art.colorfulFields?.mind?.node?.uri || '' } },
+      freestyle: mapARExperience(art.colorfulFields, 'freestyle'),
+      making: mapARExperience(art.colorfulFields, 'making'),
+      history: mapARExperience(art.colorfulFields, 'history'),
+      storyEn: art.colorfulFields?.storyEn || '',
+      storyDe: art.colorfulFields?.storyDe || '',
+      wikiLinkEn: art.colorfulFields?.wikiLinkEn || '',
+      wikiLinkDe: art.colorfulFields?.wikiLinkDe || '',
+    },
   }
 }
