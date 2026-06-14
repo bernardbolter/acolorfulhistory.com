@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/routing'
 import { getTranslations } from 'next-intl/server'
 import TitleOrnament from '@/components/UI/TitleOrnament'
+import TriptychOverviewRow from '@/components/Triptych/TriptychOverviewRow'
 import type { MoPSeriesOverview } from '@/types/series'
 
 interface MoPOverviewPageProps {
@@ -18,14 +19,14 @@ export default async function MoPOverviewPage({ overview }: MoPOverviewPageProps
           {t('mediumsOfPerception')}
         </h1>
         <p className="mt-6 text-body text-text-muted">{t('comingSoon')}</p>
-        <Link href="/series" className="mt-8 inline-block text-nav-link underline">
+        <Link href="/series" className="home-cta mt-8 inline-block">
           → {t('series')}
         </Link>
       </main>
     )
   }
 
-  const { series, triptychs } = overview
+  const { series, triptychs, mediumsOfWarTriptychs = [] } = overview
 
   return (
     <main className="min-h-screen bg-surface-page px-6 pt-28 pb-24 l:px-12">
@@ -39,20 +40,23 @@ export default async function MoPOverviewPage({ overview }: MoPOverviewPageProps
       )}
 
       <section className="mt-12">
-        <p className="label-small-caps mb-4 text-text-muted">{t('series')}</p>
-        <ul className="space-y-4">
+        <ul className="space-y-8">
           {triptychs.map((triptych) => (
-            <li key={triptych.slug}>
-              <Link
-                href={`/series/mediums-of-perception/${triptych.city.toLowerCase()}`}
-                className="text-nav-link text-text-dark underline underline-offset-4"
-              >
-                → {triptych.title} ({triptych.city})
-              </Link>
-            </li>
+            <TriptychOverviewRow key={triptych.slug} triptych={triptych} />
           ))}
         </ul>
       </section>
+
+      {mediumsOfWarTriptychs.length > 0 && (
+        <section className="mt-16 pt-8 border-t border-ui-line/20">
+          <p className="label-small-caps mb-4">{t('mediumsOfWar')}</p>
+          <ul className="space-y-8">
+            {mediumsOfWarTriptychs.map((triptych) => (
+              <TriptychOverviewRow key={triptych.slug} triptych={triptych} />
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   )
 }

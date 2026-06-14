@@ -277,13 +277,13 @@ Implement under `app/[locale]/`:
 
 **Doc:** Architecture doc § Landing page — flexible component stage
 
-- [ ] `HomePage` singleton — `sections[]` with `type` + `visible`
-- [ ] Section renderers:
-  - [ ] `hero` — featured painting or current city drop
-  - [ ] `series-feature` — MoP current series CTA
-  - [ ] `series-link` — "Explore the full collection →" links to `/series`
-  - [ ] `ar-feature` — AR experience promo
-  - [ ] `exhibition` — pulls from Events ACH tab when `featuredOnACH && achVisible`
+- [x] `HomePage` singleton — `sections[]` with `type` + `visible`
+- [x] Section renderers:
+  - [x] `hero` — featured painting or current city drop
+  - [x] `series-feature` — MoP current series CTA
+  - [x] `series-link` — "Explore the full collection →" links to `/series`
+  - [x] `ar-feature` — AR experience promo
+  - [x] `exhibition` — pulls from Events ACH tab when `featuredOnACH && achVisible`
 - [ ] Hero animation (GSAP) — defer full polish if needed, but reserve section slot (`voice-and-hero-sequence.md`)
 
 **Acceptance:** Bernard can reorder/toggle sections in Payload; Berlin drop is featured.
@@ -293,12 +293,12 @@ Implement under `app/[locale]/`:
 **Doc:** Architecture doc § Map page; `site-structure-handoff.md` § Map  
 *(Same UI and behaviour as the architecture “map page” — route renamed to `/series`.)*
 
-- [ ] Move map/list explorer from home to `/series`
-- [ ] **Default view: map** on page load (`history.viewMap: true`)
-- [ ] Nav toggle switches map ↔ list (same components as today)
-- [ ] Pin click → animation → `/[slug]`; list cards → `/[slug]`
-- [ ] Keep: grayscale Protomaps tiles, palette pin colours, bottom strip, hamburger nav, filter tab
-- [ ] Do **not** redesign existing map chrome
+- [x] Move map/list explorer from home to `/series`
+- [x] **Default view: map** on page load (`history.viewMap: true`)
+- [x] Nav toggle switches map ↔ list (same components as today)
+- [x] Pin click → animation → `/[slug]`; list cards → `/[slug]`
+- [x] Keep: grayscale Protomaps tiles, palette pin colours, bottom strip, hamburger nav, filter tab
+- [x] Do **not** redesign existing map chrome
 - [ ] Tour mode — **out of June scope** (Brief 03 + Brief 08 open questions)
 
 **Acceptance:** `/series` loads map by default; list toggle works; all `mapPresence: true` artworks appear.
@@ -311,22 +311,22 @@ Build components in this order:
 
 | # | Component | Notes |
 |---|---|---|
-| 1 | `ArtworkImage` | Full width, city placeholder + overlayRects loading |
-| 2 | `TitleBlock` | Floating top-right, seeded random position, z-index toggle |
-| 3 | `MiniNav` | Slider / AR / Magnifier / Share — conditional icons |
-| 4 | `FaultLine` | Between field and dense zones |
-| 5 | `InfoTab` | Painting object + source photograph panels |
-| 6 | `StoryColumns` | `olderStory` / `newerStory` |
-| 7 | `HistoricalDatesTimeline` | 3–5 dates, Wikipedia links, overlayColors nodes |
-| 8 | `RevealSlider` | Three states, axis toggle, auto-sweep, optional field recording audio |
-| 9 | `ZoomMode` | 1600px draggable, minimap key, zoom+reveal combined |
-| 10 | `ARLink` + device-aware AR entry | mind.js on supported devices; else link to `/experience` |
-| 11 | `TriptychLink` | MoP panels only — quiet link to triptych `#commerce` |
-| 12 | `StatusBadge` | original-available / sold / prints-only |
-| 13 | `opengraph-image.tsx` | Thumbnail centred on cityPlaceholderColor square |
+| 1 | `ArtworkImage` | ✓ Full width, city placeholder + overlayRects loading |
+| 2 | `TitleBlock` | ✓ Floating top-right, seeded random position, z-index toggle |
+| 3 | `MiniNav` | ✓ Slider / AR / Magnifier / Share — conditional icons |
+| 4 | `FaultLine` | ✓ Between field and dense zones |
+| 5 | `InfoTab` | ✓ Painting object + source photograph panels |
+| 6 | `StoryColumns` | ✓ `olderStory` / `newerStory` |
+| 7 | `HistoricalDatesTimeline` | ✓ 3–5 dates, Wikipedia links, overlayColors nodes |
+| 8 | `RevealSlider` | ✓ Three states, axis toggle, auto-sweep, optional field recording audio |
+| 9 | `ZoomMode` | ✓ 1600px draggable, minimap key |
+| 10 | `ARLink` + device-aware AR entry | ✓ mind.js on supported devices; else link to `/experience` |
+| 11 | `TriptychLink` | ✓ MoP panels only — quiet link to triptych `#commerce` |
+| 12 | `StatusBadge` | ✓ original-available / sold / prints-only |
+| 13 | `opengraph-image.tsx` | ✓ Thumbnail centred on cityPlaceholderColor square |
 
-- [ ] Embed `VisualArtwork` JSON-LD in page source
-- [ ] Prev/next panel navigation when `triptychPosition` is set
+- [x] Embed `VisualArtwork` JSON-LD in page source
+- [x] Prev/next panel navigation when `triptychPosition` is set
 
 **Acceptance:** Berlin triptych panels each have full ACH experience; share sheet produces correct OG image.
 
@@ -334,9 +334,9 @@ Build components in this order:
 
 **Doc:** Brief 02 § MoP series overview page
 
-- [ ] List all triptychs — three small panels, city in Limelight, technology arc labels, status badge
-- [ ] Link each entry to triptych page
-- [ ] Mediums of War section at bottom (not separate route)
+- [x] List all triptychs — three small panels, city in Limelight, technology arc labels, status badge
+- [x] Link each entry to triptych page
+- [x] Mediums of War section at bottom (not separate route)
 
 **Acceptance:** Munich + Berlin triptychs listed; MoW reachable from bottom of page.
 
@@ -344,18 +344,18 @@ Build components in this order:
 
 **Doc:** Brief 02 § Triptych page
 
-- [ ] Mobile: one large panel top, two small bottom, tap to swap featured panel
-- [ ] Mobile: confirmation overlay on featured panel tap before navigating to artwork page
-- [ ] Desktop: three equal panels, hover shows title + "View details →"
-- [ ] `imageCaptureLabel` beneath each panel
-- [ ] Source photographs small beneath each panel with credit
-- [ ] Triptych concept copy (dense zone, damask optional)
-- [ ] Commerce section `id="commerce"`:
-  - [ ] Original set status
-  - [ ] Large print edition (15) — `printAvailableCount` from Payload
-  - [ ] Small print edition (30)
-  - [ ] `signedAndNumbered` note
-  - [ ] Add to cart → Vendure client API
+- [x] Mobile: one large panel top, two small bottom, tap to swap featured panel
+- [x] Mobile: confirmation overlay on featured panel tap before navigating to artwork page
+- [x] Desktop: three equal panels, hover shows title + "View details →"
+- [x] `imageCaptureLabel` beneath each panel
+- [x] Source photographs small beneath each panel with credit
+- [x] Triptych concept copy (dense zone, damask optional)
+- [x] Commerce section `id="commerce"`:
+  - [x] Original set status
+  - [x] Large print edition (15) — `printAvailableCount` from Payload
+  - [x] Small print edition (30)
+  - [x] `signedAndNumbered` note
+  - [x] Add to cart → Vendure client API
 
 **Acceptance:** Visitor can purchase Berlin prints; panel pages link to `#commerce`.
 
@@ -363,11 +363,11 @@ Build components in this order:
 
 **Doc:** Architecture doc § AR experience page
 
-- [ ] Payload singleton — editable copy, demo clips
-- [ ] Explain Making / History / Freestyle
-- [ ] Physical print requirement framed positively
-- [ ] Link to store / triptych commerce when available
-- [ ] JSON-LD: `HowTo`, `VideoObject`, `Product` references
+- [x] Payload singleton — editable copy, demo clips
+- [x] Explain Making / History / Freestyle
+- [x] Physical print requirement framed positively
+- [x] Link to store / triptych commerce when available
+- [x] JSON-LD: `HowTo`, `VideoObject`, `Product` references
 
 **Acceptance:** Non-AR devices land here from artwork AR icon; page is reachable from main nav.
 
@@ -375,10 +375,10 @@ Build components in this order:
 
 **Doc:** Brief 01 § AR entry point
 
-- [ ] Load `.mind` marker from Payload `arMarkerFile`
-- [ ] Three video buttons using `arButtonColors` / posters
-- [ ] 8–10s timeout overlay with Try again / Learn more → `/experience`
-- [ ] Works on physical painting and print
+- [ ] Load `.mind` marker from Payload `arMarkerFile` (video player + controls built; full mind.js marker tracking pending)
+- [x] Three video buttons using `arButtonColors` / posters
+- [x] 8–10s timeout overlay with Try again / Learn more → `/experience`
+- [ ] Works on physical painting and print (requires mind.js + `.mind` assets from archive)
 
 **Acceptance:** AR demonstrable in studio at launch.
 
@@ -386,9 +386,9 @@ Build components in this order:
 
 **Doc:** `ach-schema-and-build.md` Part 5, Brief 07 Part 5
 
-- [ ] `generateArtworkJsonLd()` utility — includes ACH fields, `isBasedOn`, `locationCreated.sameAs`
-- [ ] Per-artwork embedded JSON-LD on artwork pages
-- [ ] `/archive.jsonld` public corpus route (`revalidate: 3600`)
+- [x] `generateArtworkJsonLd()` utility — includes ACH fields, `isBasedOn`, `locationCreated.sameAs`
+- [x] Per-artwork embedded JSON-LD on artwork pages
+- [x] `/archive.jsonld` public corpus route (`revalidate: 3600`)
 
 **Acceptance:** Valid VisualArtwork output for Berlin panels; corpus endpoint returns ItemList.
 
@@ -396,9 +396,9 @@ Build components in this order:
 
 **Doc:** `ach-schema-and-build.md` Part 3
 
-- [ ] Client-side add-to-cart on triptych commerce section
-- [ ] Display `printAvailableCount` from Payload (webhook-synced)
-- [ ] Webhook endpoint lives on archive/Payload side — confirm ownership; ACH only displays counts
+- [x] Client-side add-to-cart on triptych commerce section
+- [x] Display `printAvailableCount` from Payload (webhook-synced)
+- [x] Webhook endpoint lives on archive/Payload side — confirm ownership; ACH only displays counts
 
 **Acceptance:** Purchase flow completes for Berlin print edition.
 
