@@ -1,9 +1,3 @@
-export function interpolate(
-  value: number, 
-  inMin: number, 
-  inMax: number, 
-  outMin: number, 
-  outMax: number
-): number {
-  return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-}
+export { interpolate } from './interpolate'
+export { decideColor } from './decideColor'
+export { triggerArtworkAnimation } from './animation'

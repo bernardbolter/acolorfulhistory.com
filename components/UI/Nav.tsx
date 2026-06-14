@@ -1,30 +1,28 @@
 "use client"
 
-import { useContext } from 'react'
-import { usePathname } from 'next/navigation'
-import { HistoryContext } from '@/providers/HistoryProvider'
+import { usePathname, useRouter } from '@/i18n/routing'
+import { useHistory } from '@/providers/HistoryProvider'
 import { useTranslations, useLocale } from 'next-intl'
 import Link from 'next/link'
 import DEflag from '@/svgs/DE'
 import USflag from '@/svgs/US'
 
 export default function Nav() {
-  const [history, setHistory] = useContext(HistoryContext)
+  const [history, setHistory] = useHistory()
   const locale = useLocale()
-  const t = useTranslations() // flat structure – no namespace needed
+  const t = useTranslations()
   const pathname = usePathname()
-
-  const isArtworkPage =
-    pathname.split('/').length === 3 &&
-    pathname !== `/${locale}` &&
-    !pathname.includes('/contact') &&
-    !pathname.includes('/about')
+  const router = useRouter()
 
   const isMenuOpen = history.navOpen
 
+  const switchLocale = (nextLocale: 'en' | 'de') => {
+    if (nextLocale === locale) return
+    router.replace(pathname, { locale: nextLocale })
+  }
+
   return (
     <section className="w-full">
-      {/* Top right hamburger button */}
       <div className="fixed top-2.5 right-5 z-[200]">
         <button
           className="relative w-8 h-8 bg-transparent border-none cursor-pointer focus:outline-none"
@@ -33,7 +31,6 @@ export default function Nav() {
           aria-expanded={isMenuOpen}
           aria-controls="navigation"
         >
-          {/* Hamburger lines */}
           <span
             className={`
               block absolute left-[7px] h-0.5 rounded-sm bg-menu-color transition-all duration-300
@@ -61,36 +58,59 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* Menu panel */}
       <nav
         id="navigation"
         className={`
             fixed inset-x-0 top-0 z-[100] w-full bg-nav-background/95 transition-all duration-500
             -translate-y-full
             ${isMenuOpen ? 'translate-y-0' : ''}
-            lg:right-0 lg:left-auto lg:w-[300px] lg:h-[470px] lg:p-8 lg:pt-16
+            l:right-0 l:left-auto l:w-[300px] l:h-[470px] l:p-8 l:pt-16
         `}
       >
-        <div className="p-5 lg:p-8 lg:pt-16">
-
-          {/* Map toggle + language switch */}
+        <div className="p-5 l:p-8 l:pt-16">
           <div className="flex items-center justify-between mb-6 border-b border-light-dark pb-2">
             <div className="flex gap-3">
               <button
-                onClick={() => {/* switch to en – use next-intl router or cookie */}}
-                className={`opacity-${locale === 'en' ? '80' : '30'} hover:opacity-100 transition-opacity`}
+                type="button"
+                onClick={() => switchLocale('en')}
+                className={`${locale === 'en' ? 'opacity-80' : 'opacity-30'} hover:opacity-100 transition-opacity`}
+                aria-label="English"
               >
                 <div className="w-8 h-6">
-                    <USflag />
+                  <USflag />
                 </div>
               </button>
               <button
-                onClick={() => {/* switch to de */}}
-                className={`opacity-${locale === 'de' ? '80' : '30'} hover:opacity-100 transition-opacity`}
+                type="button"
+                onClick={() => switchLocale('de')}
+                className={`${locale === 'de' ? 'opacity-80' : 'opacity-30'} hover:opacity-100 transition-opacity`}
+                aria-label="Deutsch"
               >
                 <div className="w-8 h-6">
-                    <DEflag />
+                  <DEflag />
                 </div>
+              </button>
+            </div>
+          </div>
+
+          <div className="mb-6 border-b border-light-dark pb-4">
+            <p className="text-xs uppercase tracking-widest text-text-light mb-3">
+              {t('map')} / {t('list')}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className={`nav-view-toggle ${history.viewMap ? 'nav-view-toggle-active' : ''}`}
+                onClick={() => setHistory((state) => ({ ...state, viewMap: true }))}
+              >
+                {t('map')}
+              </button>
+              <button
+                type="button"
+                className={`nav-view-toggle ${!history.viewMap ? 'nav-view-toggle-active' : ''}`}
+                onClick={() => setHistory((state) => ({ ...state, viewMap: false }))}
+              >
+                {t('list')}
               </button>
             </div>
           </div>

@@ -1,60 +1,48 @@
-import { useRef, useEffect } from 'react'
-import { useHistory } from "@/providers/HistoryProvider"
-import Image from 'next/image'
+'use client'
 
-import type { Artwork } from '@/types/history';
+import Image from 'next/image'
+import { useHistory } from '@/providers/HistoryProvider'
+import { getArtworkImageUrl, getThumbnailWidth } from '@/lib/mapArtwork'
+import type { Artwork } from '@/types'
+
 interface MapNavImageProps {
-  art: Artwork;
-  index: number;
+  art: Artwork
+  index: number
+  onNavigate?: (artwork: Artwork) => void
 }
 
-const MapNavImage = ({ art, index }: MapNavImageProps) => {
-    const [ history, setHistory] = useHistory()
-    const ref = useRef<HTMLDivElement>(null)
+export default function MapNavImage({ art, index, onNavigate }: MapNavImageProps) {
+  const [, setHistory] = useHistory()
+  const imageUrl = getArtworkImageUrl(art)
+  const displayWidth = getThumbnailWidth(art)
 
-    useEffect(() => {
-        if (ref.current) {
-            const width = ref.current.clientWidth
-            setHistory(state => ({
-                ...state,
-                mapNavKey: [...state.mapNavKey, {index, width}]
-            }))
-        }
-    }, [art.slug, index, setHistory])
-
-    const aspectRatio = art.image.width && art.image.height
-        ? art.image.width / art.image.height
-        : 1
-
-    const displayWidth = Math.round(100 * aspectRatio)
-
-    return (
-        <div
-            ref={ref}
-            className="map-nav-art"
-            onClick={() => {
-                console.log("clicked " + art.slug)
-                setHistory(state => ({
-                    ...state, 
-                    currentMapArtwork: art, 
-                    popupOpen: art.slug 
-                }))
-            }}
-        >
-            <Image
-                src={art.image.sourceUrl}
-                alt={`thumbnail image of ${art.title}`}
-                width={displayWidth}
-                height={100}
-                sizes="100px"
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                }}
-            />
-        </div>
-    )
-}   
-
-export default MapNavImage
+  return (
+    <button
+      type="button"
+      className="map-nav-art"
+      style={{ width: displayWidth, height: 100 }}
+      onClick={() => {
+        setHistory((state) => ({
+          ...state,
+          currentMapNavIndex: index,
+          currentMapArtwork: art,
+          popupOpen: art.slug,
+        }))
+        onNavigate?.(art)
+      }}
+    >
+      {imageUrl ? (
+        <Image
+          src={imageUrl}
+          alt={art.title}
+          width={displayWidth}
+          height={100}
+          sizes="100px"
+          className="map-nav-art-image"
+        />
+      ) : (
+        <div className="map-nav-art-placeholder" />
+      )}
+    </button>
+  )
+}

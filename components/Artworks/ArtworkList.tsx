@@ -1,12 +1,13 @@
 "use client"
 
-import { useContext, useEffect, useMemo } from 'react'
+import { useContext, useEffect } from 'react'
 import { HistoryContext } from '@/providers/HistoryProvider'
 import { Artwork } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useLocale } from 'next-intl'
 import Loader from '@/components/UI/Loader'
+import { buildPinColors, getUniqueCities } from '@/lib/mapArtwork'
 
 interface ArtworkListProps {
   artworks: Artwork[]
@@ -16,20 +17,19 @@ const ArtworkList = ({ artworks }: ArtworkListProps) => {
   const [history, setHistory] = useContext(HistoryContext)
   const locale = useLocale()
 
-  const randomizedArtworks = useMemo(() => {
-    return [...artworks].sort(() => Math.random() - 0.5)
-  }, [artworks])
-
   useEffect(() => {
     if (history.original.length === 0 && artworks.length > 0) {
-      setHistory(state => ({
+      const cities = getUniqueCities(artworks)
+      setHistory((state) => ({
         ...state,
         original: artworks,
-        filtered: randomizedArtworks,
+        filtered: artworks,
+        checked: cities,
+        pinColors: buildPinColors(artworks),
         loaded: true,
       }))
     }
-  }, [])
+  }, [artworks, history.original.length, setHistory])
 
   return (
     <div className="w-full">

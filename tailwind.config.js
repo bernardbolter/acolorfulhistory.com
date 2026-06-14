@@ -8,6 +8,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        l: '769px',
+      },
       colors: {
         red: 'var(--red)',
         'red-orange': 'var(--red-orange)',

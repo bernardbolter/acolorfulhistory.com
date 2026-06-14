@@ -78,7 +78,7 @@ export interface Artwork {
     artworkFields: ArtworkFields;
     colorfulFields?: ColorfulFields;
     title: string;
-    content: string;
+    content?: string;
     databaseId: number;
     id: string;
     date: string;

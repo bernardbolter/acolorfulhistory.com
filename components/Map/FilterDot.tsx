@@ -1,21 +1,21 @@
-import { useMemo } from 'react'
+'use client'
 
-import variables from '@/style/vars.module.scss'
-import { decideColor } from '@/helpers/helpers'
+import { decideColor } from '@/helpers/decideColor'
 
-const FilterDot = ({ checked }) => {
-    const filterColor = useMemo(() => {
-        return decideColor(variables)
-    }, [])
-
-    return (
-        <div
-            className="filter-checkbox"
-            style={{
-                "background" : checked ? filterColor : 'rgba(255,255,255,.2)'
-            }}
-        />
-    )
+interface FilterDotProps {
+  checked: boolean
+  city?: string
 }
 
-export default FilterDot
+export default function FilterDot({ checked, city }: FilterDotProps) {
+  const color = decideColor(city || 'default')
+
+  return (
+    <div
+      className="filter-checkbox"
+      style={{
+        background: checked ? color : 'rgba(255,255,255,0.2)',
+      }}
+    />
+  )
+}

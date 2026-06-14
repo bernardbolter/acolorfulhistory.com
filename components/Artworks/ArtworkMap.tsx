@@ -1,28 +1,24 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react'
-import { useHistory } from "@/providers/HistoryProvider"
+import { useRef, useMemo, useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-
 import { MapRef, Map as LibreMap, Marker, Popup } from '@vis.gl/react-maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { Map as MapLibreMapInstance } from 'maplibre-gl'
 
-import MapNav from '@/components/artwork/map/MapNav'
-
-import MapPin from '@/svg/mapPin'
-import RightArrow from '@/svg/rightArrow'
-import Enlarge from '@/svg/enlarge'
-
-import { Controlled as ControlledZoom } from 'react-medium-image-zoom'
-import 'react-medium-image-zoom/dist/styles.css'
-
-import { interpolate } from '@/helpers/helpers'
-import { triggerArtworkAnimation } from '@/helpers/animation'
-
-import { Artwork } from '@/types/history'
+import { useHistory } from '@/providers/HistoryProvider'
+import MapNav from '@/components/Map/MapNav'
+import MapPin from '@/svgs/MapPin'
+import RightArrow from '@/svgs/RightArrow'
+import Enlarge from '@/svgs/Enlarge'
+import { interpolate, triggerArtworkAnimation } from '@/helpers'
+import {
+  getArtworkLat,
+  getArtworkLng,
+  getArtworkImageUrl,
+  getThumbnailWidth,
+  hasMapLocation,
+} from '@/lib/mapArtwork'
+import type { Artwork } from '@/types'
 
 interface MarkerGroup {
   artworks: Artwork[]
@@ -30,369 +26,328 @@ interface MarkerGroup {
   lng: number
 }
 
-const getProportion = (artwork: Artwork): number => {
-  return artwork.image.width && artwork.image.height
-    ? artwork.image.height / artwork.image.width
-    : 1
-}
-
-const ArtworkMap = () => {
+export default function ArtworkMap() {
   const [history, setHistory] = useHistory()
   const mapRef = useRef<MapRef | null>(null)
-  const router = useRouter()
-  console.log(history.filtered)
 
-  // Simplified state management
   const [markerGroups, setMarkerGroups] = useState<MarkerGroup[]>([])
-  const [multipleMarkerIndices, setMultipleMarkerIndices] = useState<Record<string, number>>({})
-  const [isZoomedIndex, setIsZoomedIndex] = useState<Record<string, boolean>>({})
+  const [multipleMarkerIndices, setMultipleMarkerIndices] = useState<
+    Record<string, number>
+  >({})
 
-  const [viewport, setViewport] = useState({
-    latitude: history.coords.lat,
-    longitude: history.coords.lng,
-    zoom: history.zoomLevel,
-  })
+  const protomapsKey = process.env.NEXT_PUBLIC_PROTOMAPS
+  const mapStyle = protomapsKey
+    ? `https://api.protomaps.com/styles/v5/grayscale/en.json?key=${protomapsKey}`
+    : 'https://demotiles.maplibre.org/style.json'
 
-  // Group artworks by location (lat/lng)
   useEffect(() => {
-    if (history.filtered.length === 0) return
-
-    // Filter artworks that have location data
-    const placedArtworks = history.filtered.filter(
-      artwork => artwork.lat && artwork.lng
-    )
-
-    // Group by location
+    const placedArtworks = history.filtered.filter(hasMapLocation)
     const locationGroups = new Map<string, Artwork[]>()
-    
-    placedArtworks.forEach(artwork => {
-      const locationKey = `${artwork.lat},${artwork.lng}`
+
+    placedArtworks.forEach((artwork) => {
+      const lat = getArtworkLat(artwork)!
+      const lng = getArtworkLng(artwork)!
+      const locationKey = `${lat},${lng}`
       if (!locationGroups.has(locationKey)) {
         locationGroups.set(locationKey, [])
       }
       locationGroups.get(locationKey)!.push(artwork)
     })
 
-    // Convert to MarkerGroup format
-    const groups: MarkerGroup[] = Array.from(locationGroups.entries()).map(([locationKey, artworks]) => ({
-      artworks,
-      lat: artworks[0].lat,
-      lng: artworks[0].lng,
-    }))
+    const groups: MarkerGroup[] = Array.from(locationGroups.entries()).map(
+      ([, artworks]) => ({
+        artworks,
+        lat: getArtworkLat(artworks[0])!,
+        lng: getArtworkLng(artworks[0])!,
+      })
+    )
 
     setMarkerGroups(groups)
 
-    // Initialize indices for multiple marker groups
     const newIndices: Record<string, number> = {}
-    groups.forEach(group => {
+    groups.forEach((group) => {
       if (group.artworks.length > 1) {
-        const groupKey = `${group.lat},${group.lng}`
-        newIndices[groupKey] = 0
+        newIndices[`${group.lat},${group.lng}`] = 0
       }
     })
     setMultipleMarkerIndices(newIndices)
-
-    // Close any existing popups when markers change to prevent duplicates
-    setHistory(state => ({ ...state, popupOpen: '' }))
-
+    setHistory((state) => ({ ...state, popupOpen: '' }))
   }, [history.filtered, setHistory])
 
-  // Handle zoom change for images
-  const handleZoomChange = useCallback((shouldZoom: boolean, id: string) => {
-    setIsZoomedIndex(prev => ({ ...prev, [id]: shouldZoom }))
-  }, [])
-
-  // Check if any artwork in a group should show popup
-  const shouldShowPopup = useCallback((artworks: Artwork[]) => {
-    return artworks.some(artwork => history.popupOpen === artwork.slug)
-  }, [history.popupOpen])
-
-  // Get current artwork from group based on index
-  const getCurrentArtwork = useCallback((group: MarkerGroup) => {
-    const groupKey = `${group.lat},${group.lng}`
-    const index = multipleMarkerIndices[groupKey] || 0
-    return group.artworks[index]
-  }, [multipleMarkerIndices])
-
-  // Navigation handlers for multiple markers
-  const handlePrevious = useCallback((group: MarkerGroup) => {
-    const groupKey = `${group.lat},${group.lng}`
-    const currentIndex = multipleMarkerIndices[groupKey] || 0
-    
-    if (currentIndex > 0) {
-      setMultipleMarkerIndices(prev => ({
-        ...prev,
-        [groupKey]: currentIndex - 1
-      }))
-    }
-  }, [multipleMarkerIndices])
-
-  const handleNext = useCallback((group: MarkerGroup) => {
-    const groupKey = `${group.lat},${group.lng}`
-    const currentIndex = multipleMarkerIndices[groupKey] || 0
-    
-    if (currentIndex < group.artworks.length - 1) {
-      setMultipleMarkerIndices(prev => ({
-        ...prev,
-        [groupKey]: currentIndex + 1
-      }))
-    }
-  }, [multipleMarkerIndices])
-
-  // Calculate total width for carousel
-  const getTotalWidth = useCallback((artworks: Artwork[]) => {
-    return artworks.reduce((total, artwork) => total + (100 * getProportion(artwork)), 0)
-  }, [])
-
-  // Calculate transform offset for carousel
-  const getTransformOffset = useCallback((group: MarkerGroup) => {
-    const groupKey = `${group.lat},${group.lng}`
-    const currentIndex = multipleMarkerIndices[groupKey] || 0
-    
-    let offset = 0
-    for (let i = 0; i < currentIndex; i++) {
-      offset -= 100 * getProportion(group.artworks[i])
-    }
-    return offset
-  }, [multipleMarkerIndices])
-
-  // Single marker component
-  const SingleMarker: React.FC<{ artwork: Artwork }> = ({ artwork }) => (
-    <div className="map-marker-container" key={artwork.slug}>
-      <Marker
-        longitude={artwork.lng}
-        latitude={artwork.lat}
-        anchor="bottom"
-        onClick={(e) => {
-          e.originalEvent.stopPropagation()
-          // Close any existing popup and open this one
-          setHistory(state => ({ ...state, popupOpen: artwork.slug }))
-        }}
-      >
-        <MapPin artworkId={artwork.slug} />
-      </Marker>
-      {history.popupOpen === artwork.slug && (
-        <Popup
-          longitude={artwork.lng}
-          latitude={artwork.lat}
-          onClose={() => setHistory(state => ({ ...state, popupOpen: '' }))}
-          closeButton={false}
-          offset={25}
-          anchor="bottom"
-        >
-          <div className="map-pop-single-container">
-            <ControlledZoom
-              zoomMargin={20}
-              isZoomed={isZoomedIndex[artwork.slug] || false}
-              onZoomChange={(shouldZoom) => handleZoomChange(shouldZoom, artwork.slug)}
-            >
-              <img 
-                src={artwork.image.sourceUrl} 
-                alt={`Artwork: ${artwork.title}`}
-                sizes="100px"
-                width={100 * getProportion(artwork)}
-                height={100}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  triggerArtworkAnimation(
-                    artwork as any,
-                    e.currentTarget,
-                    setHistory,
-                    history.coords,
-                    history.zoomLevel,
-                    history.popupOpen
-                  )
-                }}
-                style={{ cursor: 'pointer' }}
-              />
-            </ControlledZoom>
-          </div>
-        </Popup>
-      )}
-    </div>
+  const getCurrentArtwork = useCallback(
+    (group: MarkerGroup) => {
+      const groupKey = `${group.lat},${group.lng}`
+      const index = multipleMarkerIndices[groupKey] || 0
+      return group.artworks[index]
+    },
+    [multipleMarkerIndices]
   )
 
-  // Multiple marker component
-  const MultipleMarker: React.FC<{ group: MarkerGroup }> = ({ group }) => {
-    const groupKey = `${group.lat},${group.lng}`
-    const currentIndex = multipleMarkerIndices[groupKey] || 0
-    const currentArtwork = getCurrentArtwork(group)
-    const totalWidth = getTotalWidth(group.artworks)
-    const transformOffset = getTransformOffset(group)
-    const router = useRouter()
+  const handleThumbnailClick = useCallback(
+    (artwork: Artwork, element: HTMLElement) => {
+      triggerArtworkAnimation(
+        artwork,
+        element,
+        setHistory,
+        history.coords,
+        history.zoomLevel,
+        history.popupOpen
+      )
+    },
+    [history.coords, history.popupOpen, history.zoomLevel, setHistory]
+  )
+
+  useEffect(() => {
+    const lat = history.currentMapArtwork?.artworkFields?.lat
+    const lng = history.currentMapArtwork?.artworkFields?.lng
+
+    if (lat != null && lng != null && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [lng, lat],
+        zoom: 15,
+      })
+    }
+  }, [history.currentMapArtwork])
+
+  const onZoom = useCallback(
+    (e: { viewState: { zoom: number } }) => {
+      setHistory((state) => ({
+        ...state,
+        mapPointScale: interpolate(e.viewState.zoom, 0, 23, 0, 2),
+      }))
+    },
+    [setHistory]
+  )
+
+  const renderPopupImage = (artwork: Artwork) => {
+    const imageUrl = getArtworkImageUrl(artwork)
+    const thumbWidth = getThumbnailWidth(artwork)
+
+    if (!imageUrl) return null
 
     return (
-      <div className="map-marker-container" key={groupKey}>
-        <Marker
-          longitude={group.lng}
-          latitude={group.lat}
-          anchor="bottom"
-          onClick={(e) => {
-            e.originalEvent.stopPropagation()
-            const currentArtwork = getCurrentArtwork(group)
-            // Close any existing popup and open this one
-            setHistory(state => ({ ...state, popupOpen: currentArtwork.slug }))
-          }}
-        >
-          <MapPin artworkId={currentArtwork.slug} />
-        </Marker>
-        {shouldShowPopup(group.artworks) && (
-          <Popup
-            longitude={group.lng}
-            latitude={group.lat}
-            onClose={() => setHistory(state => ({ ...state, popupOpen: '' }))}
-            closeButton={false}
-            offset={20}
-            anchor="bottom"
-          >
-            <div 
-              className="map-pop-multiple-container"
-              style={{
-                width: 100 * getProportion(currentArtwork)
-              }}   
-            >
-              {/* Navigation buttons */}
-              <div 
-                className={`map-marker-left-container ${currentIndex === 0 ? 'marker-nav-disabled' : ''}`}
-                onClick={() => handlePrevious(group)}
-              >
-                <RightArrow />
-              </div>
-              <div 
-                className={`map-marker-right-container ${currentIndex === group.artworks.length - 1 ? 'marker-nav-disabled' : ''}`}
-                onClick={() => handleNext(group)}
-              >
-                <RightArrow />
-              </div>
-
-              {/* Carousel container */}
-              <div 
-                className="map-pop-multiple-inner"
-                style={{
-                  width: totalWidth,
-                  transform: `translateX(${transformOffset}px)`
-                }}  
-              >
-                {group.artworks.map(artwork => (
-                  <div 
-                    key={artwork.slug}
-                    className="map-pop-multiple-art"
-                    style={{
-                      width: 100 * getProportion(artwork),
-                    }}
-                    onClick={() => {
-                      console.log('clicked multiple')
-                      if (artwork.slug !== history.popupOpen) {
-                        setHistory(state => ({ ...state, popupOpen: artwork.slug }))
-                      }
-
-                    }}
-                  >
-                    <Image
-                      src={artwork.image.sourceUrl || ''}
-                      alt={`thumbnail image of ${artwork.title}`}
-                      sizes="100px"
-                      width={100 * getProportion(artwork)}
-                      height={100}
-                      // onClick={(e) => {
-                      //   e.stopPropagation()
-                      //   triggerArtworkAnimation(
-                      //     artwork as any,
-                      //     e.currentTarget,
-                      //     setHistory,
-                      //     history.coords,
-                      //     history.zoomLevel,
-                      //     history.popupOpen
-                      //   )
-                      // }}
-                      onClick={() => {
-                        console.log('clicked: ', artwork.slug)
-                      }}
-                      style={{ cursor: 'pointer' }}
-                    />
-                    <div 
-                      className="map-pop-multiple-overlay"
-                      style={{
-                        width: 100 * getProportion(artwork),
-                        height: 100
-                      }}
-                      // onClick={(e) => {
-                      //   console.log('clicked enlarge')
-                      //   e.stopPropagation()
-                      //   triggerArtworkAnimation(
-                      //     artwork as any,
-                      //     e.currentTarget,
-                      //     setHistory,
-                      //     history.coords,
-                      //     history.zoomLevel,
-                      //     history.popupOpen
-                      //   )
-                      // }}
-                      onClick={() => {
-                        console.log('clicked: ', artwork.slug)
-                        router.push(`/${artwork.slug}`)
-                      }}
-                    >
-                      <Enlarge />
-                    </div>
-                    <p>{artwork.title}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Popup>
-        )}
-      </div>
+      <img
+        src={imageUrl}
+        alt={artwork.title}
+        width={thumbWidth}
+        height={100}
+        className="map-popup-image"
+        onClick={(e) => {
+          e.stopPropagation()
+          handleThumbnailClick(artwork, e.currentTarget)
+        }}
+      />
     )
   }
 
-  // Render markers
   const markers = useMemo(() => {
-    return markerGroups.map(group => {
+    return markerGroups.map((group) => {
       if (group.artworks.length === 1) {
-        return <SingleMarker key={group.artworks[0].slug} artwork={group.artworks[0]} />
-      } else {
-        return <MultipleMarker key={`${group.lat},${group.lng}`} group={group} />
+        const artwork = group.artworks[0]
+        const lat = getArtworkLat(artwork)!
+        const lng = getArtworkLng(artwork)!
+        const pinColor = history.pinColors[artwork.slug]
+
+        return (
+          <div className="map-marker-container" key={artwork.slug}>
+            <Marker
+              longitude={lng}
+              latitude={lat}
+              anchor="bottom"
+              onClick={(e) => {
+                e.originalEvent.stopPropagation()
+                setHistory((state) => ({ ...state, popupOpen: artwork.slug }))
+              }}
+            >
+              <MapPin color={pinColor} scale={history.mapPointScale || 1} />
+            </Marker>
+            {history.popupOpen === artwork.slug && (
+              <Popup
+                longitude={lng}
+                latitude={lat}
+                onClose={() =>
+                  setHistory((state) => ({ ...state, popupOpen: '' }))
+                }
+                closeButton={false}
+                offset={25}
+                anchor="bottom"
+              >
+                <div className="map-pop-single-container">
+                  {renderPopupImage(artwork)}
+                </div>
+              </Popup>
+            )}
+          </div>
+        )
       }
+
+      const groupKey = `${group.lat},${group.lng}`
+      const currentIndex = multipleMarkerIndices[groupKey] || 0
+      const currentArtwork = getCurrentArtwork(group)
+      const pinColor = history.pinColors[currentArtwork.slug]
+      const totalWidth = group.artworks.reduce(
+        (total, art) => total + getThumbnailWidth(art),
+        0
+      )
+
+      let transformOffset = 0
+      for (let i = 0; i < currentIndex; i++) {
+        transformOffset -= getThumbnailWidth(group.artworks[i])
+      }
+
+      const showPopup = group.artworks.some(
+        (art) => history.popupOpen === art.slug
+      )
+
+      return (
+        <div className="map-marker-container" key={groupKey}>
+          <Marker
+            longitude={group.lng}
+            latitude={group.lat}
+            anchor="bottom"
+            onClick={(e) => {
+              e.originalEvent.stopPropagation()
+              setHistory((state) => ({
+                ...state,
+                popupOpen: getCurrentArtwork(group).slug,
+              }))
+            }}
+          >
+            <MapPin color={pinColor} scale={history.mapPointScale || 1} />
+          </Marker>
+          {showPopup && (
+            <Popup
+              longitude={group.lng}
+              latitude={group.lat}
+              onClose={() =>
+                setHistory((state) => ({ ...state, popupOpen: '' }))
+              }
+              closeButton={false}
+              offset={20}
+              anchor="bottom"
+            >
+              <div
+                className="map-pop-multiple-container"
+                style={{ width: getThumbnailWidth(currentArtwork) }}
+              >
+                <button
+                  type="button"
+                  className={`map-marker-nav map-marker-left ${
+                    currentIndex === 0 ? 'marker-nav-disabled' : ''
+                  }`}
+                  onClick={() =>
+                    setMultipleMarkerIndices((prev) => ({
+                      ...prev,
+                      [groupKey]: Math.max(0, currentIndex - 1),
+                    }))
+                  }
+                  aria-label="Previous artwork"
+                >
+                  <RightArrow />
+                </button>
+                <button
+                  type="button"
+                  className={`map-marker-nav map-marker-right ${
+                    currentIndex === group.artworks.length - 1
+                      ? 'marker-nav-disabled'
+                      : ''
+                  }`}
+                  onClick={() =>
+                    setMultipleMarkerIndices((prev) => ({
+                      ...prev,
+                      [groupKey]: Math.min(
+                        group.artworks.length - 1,
+                        currentIndex + 1
+                      ),
+                    }))
+                  }
+                  aria-label="Next artwork"
+                >
+                  <RightArrow />
+                </button>
+
+                <div
+                  className="map-pop-multiple-inner"
+                  style={{
+                    width: totalWidth,
+                    transform: `translateX(${transformOffset}px)`,
+                  }}
+                >
+                  {group.artworks.map((artwork) => {
+                    const imageUrl = getArtworkImageUrl(artwork)
+                    const thumbWidth = getThumbnailWidth(artwork)
+
+                    return (
+                      <div
+                        key={artwork.slug}
+                        className="map-pop-multiple-art"
+                        style={{ width: thumbWidth }}
+                      >
+                        {imageUrl && (
+                          <Image
+                            src={imageUrl}
+                            alt={artwork.title}
+                            width={thumbWidth}
+                            height={100}
+                            className="map-popup-image"
+                            onClick={(e) => {
+                              if (artwork.slug !== history.popupOpen) {
+                                setHistory((state) => ({
+                                  ...state,
+                                  popupOpen: artwork.slug,
+                                }))
+                              }
+                            }}
+                          />
+                        )}
+                        <button
+                          type="button"
+                          className="map-pop-multiple-overlay"
+                          style={{ width: thumbWidth, height: 100 }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleThumbnailClick(artwork, e.currentTarget)
+                          }}
+                          aria-label={`View ${artwork.title}`}
+                        >
+                          <Enlarge />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </Popup>
+          )}
+        </div>
+      )
     })
-  }, [markerGroups, history.popupOpen, multipleMarkerIndices, isZoomedIndex])
-
-  // Fly to artwork location
-  useEffect(() => {
-    // Check if the artwork exists AND if both lat and lng are valid numbers.
-    if (
-        history.currentMapArtwork && 
-        history.currentMapArtwork.lng !== undefined && 
-        history.currentMapArtwork.lat !== undefined && 
-        mapRef.current
-    ) {
-        mapRef.current.flyTo({ 
-            center: [history.currentMapArtwork.lng, history.currentMapArtwork.lat],
-            zoom: 15, // Optional: Add a standard zoom level for a smooth transition
-        });
-    }
-}, [history.currentMapArtwork]);
-
-  // Handle map zoom for marker scaling
-  const onZoom = useCallback((e: any) => {
-    setHistory(state => ({ 
-      ...state, 
-      mapPointScale: interpolate(e.viewState.zoom, 0, 23, 0, 2) 
-    }))
-  }, [setHistory])
+  }, [
+    getCurrentArtwork,
+    handleThumbnailClick,
+    history.mapPointScale,
+    history.pinColors,
+    history.popupOpen,
+    markerGroups,
+    multipleMarkerIndices,
+    setHistory,
+  ])
 
   return (
     <div className="map-wrap">
       <LibreMap
-        initialViewState={viewport}
-        style={{ width: "100%", height: "100%" }}
-        mapStyle={`https://api.protomaps.com/styles/v5/grayscale/en.json?key=${process.env.NEXT_PUBLIC_PROTOMAPS}`}
+        initialViewState={{
+          latitude: history.coords.lat,
+          longitude: history.coords.lng,
+          zoom: history.zoomLevel,
+        }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle={mapStyle}
         ref={mapRef}
         onZoom={onZoom}
-        onClick={() => {
-          // Close any open popup when clicking on empty map area
-          setHistory(state => ({ ...state, popupOpen: '' }))
-        }}
+        onClick={() =>
+          setHistory((state) => ({ ...state, popupOpen: '' }))
+        }
       >
         {markers}
       </LibreMap>
@@ -400,5 +355,3 @@ const ArtworkMap = () => {
     </div>
   )
 }
-
-export default ArtworkMap
