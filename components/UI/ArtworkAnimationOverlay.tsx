@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useRouter } from '@/i18n/routing'
 import { useHistory } from '@/providers/HistoryProvider'
 import { getArtworkImageUrl, getArtworkProportion } from '@/lib/mapArtwork'
 
@@ -11,7 +10,6 @@ const ANIMATION_MS = 600
 export default function ArtworkAnimationOverlay() {
   const [history, setHistory] = useHistory()
   const router = useRouter()
-  const locale = useLocale()
   const [style, setStyle] = useState<React.CSSProperties>({})
 
   const { animation } = history
@@ -56,7 +54,7 @@ export default function ArtworkAnimationOverlay() {
     })
 
     const timer = setTimeout(() => {
-      router.push(`/${locale}/${artwork.slug}`)
+      router.push(`/${artwork.slug}`)
       setHistory((state) => ({
         ...state,
         animation: {
@@ -72,7 +70,7 @@ export default function ArtworkAnimationOverlay() {
       cancelAnimationFrame(frame)
       clearTimeout(timer)
     }
-  }, [animation.isAnimating, artwork, locale, router, setHistory, sourceRect])
+  }, [animation.isAnimating, artwork, router, setHistory, sourceRect])
 
   if (!animation.isAnimating || !artwork || !sourceRect) return null
 

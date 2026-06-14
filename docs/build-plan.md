@@ -241,29 +241,29 @@ Implement under `app/[locale]/`:
 
 | Task | Route | File | Priority |
 |---|---|---|---|
-| [ ] Landing page | `/` | `page.tsx` (exists — replace list-only shell) | P0 — June |
-| [ ] Series explorer (map + list) | `/series` | `series/page.tsx` | P0 — June |
-| [ ] Artwork detail | `/[slug]` | `[slug]/page.tsx` (exists — expand in place) | P0 — June |
-| [ ] AR runtime | `/[slug]/ar` | `[slug]/ar/page.tsx` (exists — expand in place) | P0 — June |
-| [ ] MoP series overview | `/series/mediums-of-perception` | `series/mediums-of-perception/page.tsx` | P0 — June |
-| [ ] Triptych detail | `/series/mediums-of-perception/[city]` | `series/mediums-of-perception/[city]/page.tsx` | P0 — June |
-| [ ] AR experience | `/experience` | `experience/page.tsx` | P0 — June |
-| [ ] JSON-LD corpus | `/archive.jsonld` | `archive.jsonld/route.ts` | P1 — June |
-| [ ] About | `/about` | `about/page.tsx` | P2 — post-June |
-| [ ] Store | `/store` | `store/page.tsx` | P2 — post-June |
+| [x] Landing page | `/` | `page.tsx` (exists — replace list-only shell) | P0 — June |
+| [x] Series explorer (map + list) | `/series` | `series/page.tsx` | P0 — June |
+| [x] Artwork detail | `/[slug]` | `[slug]/page.tsx` (exists — expand in place) | P0 — June |
+| [x] AR runtime | `/[slug]/ar` | `[slug]/ar/page.tsx` (exists — expand in place) | P0 — June |
+| [x] MoP series overview | `/series/mediums-of-perception` | `series/mediums-of-perception/page.tsx` | P0 — June |
+| [x] Triptych detail | `/series/mediums-of-perception/[city]` | `series/mediums-of-perception/[city]/page.tsx` | P0 — June |
+| [x] AR experience | `/experience` | `experience/page.tsx` | P0 — June |
+| [x] JSON-LD corpus | `/archive.jsonld` | `archive.jsonld/route.ts` | P1 — June |
+| [x] About | `/about` | `about/page.tsx` | P2 — post-June |
+| [x] Store | `/store` | `store/page.tsx` | P2 — post-June |
 | [ ] Field notes (protected) | `/fieldnotes/*` | `fieldnotes/…` | P3 — post-June |
 
 ### 3.1 Navigation update
 
-- [ ] Update `Nav.tsx` links — artwork links use `/[slug]` not `/artwork/[slug]`
-- [ ] Top-level items for June: Home, **Series** (`/series`), Mediums of Perception (`/series/mediums-of-perception`), Experience
-- [ ] Store and About links hidden or marked post-June until built
-- [ ] Series page pin click, list cards, triptych panel links → `/[locale]/[slug]`
+- [x] Update `Nav.tsx` links — artwork links use `/[slug]` not `/artwork/[slug]`
+- [x] Top-level items for June: Home, **Series** (`/series`), Mediums of Perception (`/series/mediums-of-perception`), Experience
+- [x] Store and About links hidden or marked post-June until built
+- [x] Series page pin click, list cards, triptych panel links → `/[locale]/[slug]`
 
 ### 3.2 Reserved segments & routing
 
-- [ ] Define reserved slugs: `series`, `experience`, `about`, `store`, `fieldnotes`, `archive.jsonld` (and locale codes)
-- [ ] Ensure `[slug]` dynamic route does not catch reserved paths — static routes take precedence in App Router; verify with integration test
+- [x] Define reserved slugs: `series`, `experience`, `about`, `store`, `fieldnotes`, `archive.jsonld` (and locale codes)
+- [x] Ensure `[slug]` dynamic route does not catch reserved paths — static routes take precedence in App Router; verify with integration test
 - [ ] Keep `/[slug]/ar` for mind.js runtime; non-AR devices on artwork page link to `/experience` per Brief 01
 
 **Acceptance:** All June routes resolve; nav and map links use `/[locale]/[slug]`; locale prefix preserved; no slug collisions with section routes.

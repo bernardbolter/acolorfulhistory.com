@@ -3,9 +3,8 @@
 import { useContext, useEffect, useState } from 'react'
 import { HistoryContext } from '@/providers/HistoryProvider'
 import { Artwork } from '@/types'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import Image from 'next/image'
-import { useLocale } from 'next-intl'
 import Loader from '@/components/UI/Loader'
 import ArtworkImagePlaceholder from '@/components/UI/ArtworkImagePlaceholder'
 import { buildPinColors, getUniqueCities } from '@/lib/mapArtwork'
@@ -40,7 +39,6 @@ function ListArtworkThumb({ artwork }: { artwork: Artwork }) {
 
 const ArtworkList = ({ artworks }: ArtworkListProps) => {
   const [history, setHistory] = useContext(HistoryContext)
-  const locale = useLocale()
 
   useEffect(() => {
     if (history.original.length === 0 && artworks.length > 0) {
@@ -66,7 +64,7 @@ const ArtworkList = ({ artworks }: ArtworkListProps) => {
             return (
               <Link
                 key={artwork.slug}
-                href={`/${locale}/${artwork.slug}`}
+                href={`/${artwork.slug}`}
                 className={`
                   group flex items-center gap-8 px-6 py-8
                   hover:bg-surface-page transition-colors duration-300

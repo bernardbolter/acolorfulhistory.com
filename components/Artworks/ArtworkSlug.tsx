@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { Link } from '@/i18n/routing'
 
 import ARsvg from '@/svgs/ARsvg'
 import ArtworkImagePlaceholder from '@/components/UI/ArtworkImagePlaceholder'
@@ -19,7 +18,6 @@ interface Props {
 
 export default function ArtworkSlug({ artwork }: Props) {
   const { artworkFields, title, content } = artwork
-  const locale = useLocale()
   const [imageLoaded, setImageLoaded] = useState(false)
 
   const imageUrl = artworkFields.artworkImage?.mediaItemUrl
@@ -81,7 +79,7 @@ export default function ArtworkSlug({ artwork }: Props) {
           {artwork.colorfulFields?.ar && (
             <div className="l:w-1/2 flex items-start">
               <Link
-                href={`/${locale}/${artwork.slug}/ar`}
+                href={`/${artwork.slug}/ar`}
                 className="inline-flex size-20 items-center justify-center"
                 aria-label="Augmented reality"
               >

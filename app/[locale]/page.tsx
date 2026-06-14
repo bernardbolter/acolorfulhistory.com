@@ -1,7 +1,6 @@
-import Artworks from '@/components/Artworks/Artworks'
-import Logo from '@/components/UI/Logo'
-import Nav from '@/components/UI/Nav'
-import { getArtworksLite } from '@/lib/data'
+import LandingPage from '@/components/Pages/LandingPage'
+import SiteChrome from '@/components/Shell/SiteChrome'
+import { getHomePageSections } from '@/lib/data'
 
 interface Props {
   params: Promise<{ locale: string }>
@@ -9,13 +8,12 @@ interface Props {
 
 export default async function HomePage({ params }: Props) {
   const { locale } = await params
-  const artworks = await getArtworksLite(locale)
+  const homePage = await getHomePageSections(locale)
 
   return (
     <div>
-      <Artworks artworks={artworks} />
-      <Logo />
-      <Nav />
+      <LandingPage homePage={homePage} />
+      <SiteChrome />
     </div>
   )
 }

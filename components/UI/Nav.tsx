@@ -1,9 +1,8 @@
 "use client"
 
-import { usePathname, useRouter } from '@/i18n/routing'
+import { Link, usePathname, useRouter } from '@/i18n/routing'
 import { useHistory } from '@/providers/HistoryProvider'
 import { useTranslations, useLocale } from 'next-intl'
-import Link from 'next/link'
 import DEflag from '@/svgs/DE'
 import USflag from '@/svgs/US'
 
@@ -15,11 +14,17 @@ export default function Nav() {
   const router = useRouter()
 
   const isMenuOpen = history.navOpen
+  const showViewToggle = pathname === '/series'
 
   const switchLocale = (nextLocale: 'en' | 'de') => {
     if (nextLocale === locale) return
     router.replace(pathname, { locale: nextLocale })
   }
+
+  const navLinkClass = (href: string) =>
+    `text-nav-link hover:underline ${
+      pathname === href ? 'text-text-primary underline' : 'text-text-dark'
+    }`
 
   return (
     <section className="w-full">
@@ -93,37 +98,46 @@ export default function Nav() {
             </div>
           </div>
 
-          <div className="mb-6 border-b border-light-dark pb-4">
-            <p className="text-switch-label uppercase tracking-widest text-text-muted mb-3">
-              {t('map')} / {t('list')}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className={`nav-view-toggle ${history.viewMap ? 'nav-view-toggle-active' : ''}`}
-                onClick={() => setHistory((state) => ({ ...state, viewMap: true }))}
-              >
-                {t('map')}
-              </button>
-              <button
-                type="button"
-                className={`nav-view-toggle ${!history.viewMap ? 'nav-view-toggle-active' : ''}`}
-                onClick={() => setHistory((state) => ({ ...state, viewMap: false }))}
-              >
-                {t('list')}
-              </button>
+          {showViewToggle && (
+            <div className="mb-6 border-b border-light-dark pb-4">
+              <p className="text-switch-label uppercase tracking-widest text-text-muted mb-3">
+                {t('map')} / {t('list')}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className={`nav-view-toggle ${history.viewMap ? 'nav-view-toggle-active' : ''}`}
+                  onClick={() => setHistory((state) => ({ ...state, viewMap: true }))}
+                >
+                  {t('map')}
+                </button>
+                <button
+                  type="button"
+                  className={`nav-view-toggle ${!history.viewMap ? 'nav-view-toggle-active' : ''}`}
+                  onClick={() => setHistory((state) => ({ ...state, viewMap: false }))}
+                >
+                  {t('list')}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-surface-loader pb-2">
-              <Link href="/about" className="text-nav-link text-text-dark hover:underline">
-                → {t('about')}
-              </Link>
-              <Link href="/prints" className="text-nav-link text-text-dark hover:underline">
-                → {t('artPrints')}
-              </Link>
-            </div>
+          <div className="space-y-3">
+            <Link href="/" className={`block ${navLinkClass('/')}`}>
+              → {t('home')}
+            </Link>
+            <Link href="/series" className={`block ${navLinkClass('/series')}`}>
+              → {t('series')}
+            </Link>
+            <Link
+              href="/series/mediums-of-perception"
+              className={`block ${navLinkClass('/series/mediums-of-perception')}`}
+            >
+              → {t('mediumsOfPerception')}
+            </Link>
+            <Link href="/experience" className={`block ${navLinkClass('/experience')}`}>
+              → {t('experience')}
+            </Link>
           </div>
         </div>
       </nav>
