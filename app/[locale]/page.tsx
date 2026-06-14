@@ -3,8 +3,13 @@ import Logo from '@/components/UI/Logo'
 import Nav from '@/components/UI/Nav'
 import { getArtworksLite } from '@/lib/data'
 
-export default async function HomePage() {
-  const artworks = await getArtworksLite()
+interface Props {
+  params: Promise<{ locale: string }>
+}
+
+export default async function HomePage({ params }: Props) {
+  const { locale } = await params
+  const artworks = await getArtworksLite(locale)
 
   return (
     <div>

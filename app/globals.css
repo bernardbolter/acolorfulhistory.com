@@ -5,55 +5,157 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --surface-page: #ededed;
+  --surface-nav: #ececec;
+  --surface-list: #f8f8f8;
+  --surface-dark: #5e5e5e;
+  --surface-loader: #aaaaaa;
+  --surface-warm-white: #f4f2ee;
 
-  /* Your colors as CSS variables */
-  --red: #A41E22;
-  --red-orange: #CB5722;
-  --orange: #F09120;
-  --orange-yellow: #EAA121;
-  --yellow: #E1B324;
-  --yellow-olive: #B4AA45;
-  --olive: #869F66;
-  --olive-green: #6BA155;
-  --green: #4DA446;
-  --green-aqua: #419279;
-  --aqua: #1D9F97;
-  --aqua-cobalt: #3482AD;
-  --cobalt: #3482AD;
-  --cobalt-blue: #3770AA;
-  --blue: #3B5BA9;
-  --blue-purple: #50559A;
-  --purple: #674D8C;
-  --dark: #393A3A;
-  --nav-background: #ECECEC;
-  --background: #EDEDED;
-  --light-dark: #aaaaaa;
-  --dark-fill: #333333;
-  --filter-dark: #777777;
-  --art-list-background: #F8F8F8;
-  --menu-color: #717171;
-  --error-red: #BE4352;
-  --less-dark: #5E5E5E;
-  --pin-color: #9E5D5D;
-  --text: #333333;
-  --text-light: #666666;
-  --accent: #E1B324;
-  --accent-light: #EAA121;
+  /* Text */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-muted: #777777;
+  --text-menu: #717171;
+  --text-dark: #3a3f4a;
+
+  /* UI chrome */
+  --ui-line: #777777;
+  --ui-icon: #333333;
+  --ui-fault-heavy: #3a3f4a;
+  --ui-fault-light: #f0e8c0;
+
+  /* Status */
+  --status-error: #be4352;
+
+  /* Filter dot tuning */
+  --filter-dot-base: #b8742a;
+  --filter-dot-lightness: 35%;
+
+  /* Legacy aliases — map + existing CSS */
+  --background: var(--surface-page);
+  --foreground: var(--text-primary);
+  --nav-background: var(--surface-nav);
+  --art-list-background: var(--surface-list);
+  --menu-color: var(--text-menu);
+  --dark-fill: var(--text-primary);
+  --filter-dark: var(--text-muted);
+  --text: var(--text-primary);
+  --text-light: var(--text-secondary);
+  --dark: var(--text-dark);
+  --light-dark: var(--surface-loader);
+  --error-red: var(--status-error);
+  --less-dark: var(--surface-dark);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .zone-field {
+    @apply px-6 py-16 l:px-12 l:py-24;
+  }
+
+  .zone-dense {
+    @apply px-6 py-8 l:px-12 l:py-10 text-body leading-[1.5];
+  }
+
+  .label-small-caps {
+    @apply text-[0.5625rem] font-bold uppercase tracking-[0.18em] text-paint-burnt-amber;
+  }
+
+  .fault-line {
+    @apply w-full;
+  }
+
+  .fault-line-heavy {
+    @apply block h-0.5 w-full bg-ui-fault-heavy;
+  }
+
+  .fault-line-light {
+    @apply mt-0.5 block h-px w-full bg-ui-fault-light;
+  }
+
+  .title-ornament {
+    display: flex;
+    justify-content: center;
+    margin-top: 6px;
+  }
+
+  .title-ornament-inner {
+    display: flex;
+    align-items: center;
+    width: 70%;
+  }
+
+  .title-ornament-seg {
+    flex: 1;
+  }
+
+  .title-ornament-thick {
+    display: block;
+    height: 2px;
+    background: var(--ornament-color, rgba(26, 26, 26, 0.55));
+  }
+
+  .title-ornament-thin {
+    display: block;
+    height: 1px;
+    margin-top: 2px;
+    background: var(--ornament-color, rgba(26, 26, 26, 0.55));
+    opacity: 0.4;
+  }
+
+  .title-ornament-diamond {
+    flex-shrink: 0;
+    padding: 0 9px;
+    color: var(--ornament-text-color, #1a1a1a);
+    line-height: 1;
+  }
+
+  .artwork-image-placeholder {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .artwork-overlay-rect {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+
+  .artwork-overlay-rect-in {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+
+  .artwork-overlay-rect-out {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+
+  .artwork-image-loaded {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease-out;
+  }
+
+  .artwork-image-loaded-visible {
+    opacity: 1;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-page);
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -340,8 +442,8 @@ body {
 }
 
 .nav-view-toggle-active {
-  background: var(--dark-fill);
-  color: white;
+  background: var(--text-dark);
+  color: var(--surface-warm-white);
 }
 
 .artwork-animation-backdrop {

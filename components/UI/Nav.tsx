@@ -23,7 +23,7 @@ export default function Nav() {
 
   return (
     <section className="w-full">
-      <div className="fixed top-2.5 right-5 z-[200]">
+      <div className="fixed top-2.5 right-5 z-nav-chrome">
         <button
           className="relative w-8 h-8 bg-transparent border-none cursor-pointer focus:outline-none"
           onClick={() => setHistory((state) => ({ ...state, navOpen: !state.navOpen }))}
@@ -61,14 +61,14 @@ export default function Nav() {
       <nav
         id="navigation"
         className={`
-            fixed inset-x-0 top-0 z-[100] w-full bg-nav-background/95 transition-all duration-500
+            fixed inset-x-0 top-0 z-nav-menu w-full bg-surface-nav/95 transition-all duration-fast
             -translate-y-full
             ${isMenuOpen ? 'translate-y-0' : ''}
             l:right-0 l:left-auto l:w-[300px] l:h-[470px] l:p-8 l:pt-16
         `}
       >
         <div className="p-5 l:p-8 l:pt-16">
-          <div className="flex items-center justify-between mb-6 border-b border-light-dark pb-2">
+          <div className="flex items-center justify-between mb-6 border-b border-surface-loader pb-2">
             <div className="flex gap-3">
               <button
                 type="button"
@@ -94,7 +94,7 @@ export default function Nav() {
           </div>
 
           <div className="mb-6 border-b border-light-dark pb-4">
-            <p className="text-xs uppercase tracking-widest text-text-light mb-3">
+            <p className="text-switch-label uppercase tracking-widest text-text-muted mb-3">
               {t('map')} / {t('list')}
             </p>
             <div className="flex gap-2">
@@ -116,11 +116,11 @@ export default function Nav() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-light-dark pb-2">
-              <Link href="/about" className="text-dark text-base hover:underline">
+            <div className="flex justify-between items-center border-b border-surface-loader pb-2">
+              <Link href="/about" className="text-nav-link text-text-dark hover:underline">
                 → {t('about')}
               </Link>
-              <Link href="/prints" className="text-dark text-base hover:underline">
+              <Link href="/prints" className="text-nav-link text-text-dark hover:underline">
                 → {t('artPrints')}
               </Link>
             </div>

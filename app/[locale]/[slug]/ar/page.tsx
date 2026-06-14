@@ -7,8 +7,8 @@ interface Props {
 }
 
 export default async function ArtworkPage({ params }: Props) {
-  const { slug } = await params
-  const artwork = await getArtworkBySlug(slug)
+  const { slug, locale } = await params
+  const artwork = await getArtworkBySlug(slug, locale)
 
   if (!artwork) notFound()
 

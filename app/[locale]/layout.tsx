@@ -25,7 +25,7 @@ export default async function LocaleLayout({
 
   let artworks: Artwork[] = []
   try {
-    artworks = await getArtworksLite()
+    artworks = await getArtworksLite(locale)
   } catch (err) {
     console.error('Failed to fetch artworks in [locale]/layout:', err)
     // Optionally: artworks = [] or fallback data

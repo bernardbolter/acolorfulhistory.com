@@ -171,27 +171,27 @@ Work in phase order. Do not skip Phase 0–2 — later pages depend on them.
 
 ### 1.1 Color tokens
 
-- [ ] Replace rainbow CSS variables in `globals.css` with painting palette tokens from `design-system.md` §2
-- [ ] Update `tailwind.config.js` — remove retired spectrum colours; add `$paint-*` and surface/text tokens
-- [ ] Add city placeholder colour utility or helper: Berlin, SF, Munich, Amsterdam, fallback (`schema-summary.md` § Image Placeholder Colours)
+- [x] Replace rainbow CSS variables in `globals.css` with painting palette tokens from `design-system.md` §2
+- [x] Update `tailwind.config.js` — remove retired spectrum colours; add `$paint-*` and surface/text tokens
+- [x] Add city placeholder colour utility or helper: Berlin, SF, Munich, Amsterdam, fallback (`schema-summary.md` § Image Placeholder Colours)
 
 ### 1.2 Typography
 
-- [ ] Load **Barlow Semi Condensed** (UI, body, metadata) via `next/font`
-- [ ] Load **Limelight** (artwork titles on detail page, series headings with ornament)
-- [ ] Build `TitleOrnament` component (broken double rule + diamond ◆, 70% title width)
-- [ ] Remove Arial as default body font
+- [x] Load **Barlow Semi Condensed** (UI, body, metadata) via `next/font`
+- [x] Load **Limelight** (artwork titles on detail page, series headings with ornament)
+- [x] Build `TitleOrnament` component (broken double rule + diamond ◆, 70% title width)
+- [x] Remove Arial as default body font
 
 ### 1.3 Layout primitives
 
-- [ ] `FaultLine` component — 2px `#3A3F4A` + 1px `#F0E8C0` hairline
-- [ ] Field zone / dense zone spacing utilities (generous vs tight padding)
-- [ ] Configure Tailwind breakpoint: **only `l:` at 769px** — remove usage of `sm`/`md`/`lg`/`xl` in new code; fix existing violations
+- [x] `FaultLine` component — 2px `#3A3F4A` + 1px `#F0E8C0` hairline
+- [x] Field zone / dense zone spacing utilities (generous vs tight padding)
+- [x] Configure Tailwind breakpoint: **only `l:` at 769px** — remove usage of `sm`/`md`/`lg`/`xl` in new code; fix existing violations
 
 ### 1.4 Shared image loading pattern
 
-- [ ] `ArtworkImagePlaceholder` — flat `cityPlaceholderColor` + optional `overlayRects` animation
-- [ ] Never use Next.js blur placeholder
+- [x] `ArtworkImagePlaceholder` — flat `cityPlaceholderColor` + optional `overlayRects` animation
+- [x] Never use Next.js blur placeholder
 
 **Doc ref:** `design-system.md`, `site-structure-handoff.md` § What NOT to do
 
@@ -206,29 +206,29 @@ Work in phase order. Do not skip Phase 0–2 — later pages depend on them.
 
 ### 2.1 API client
 
-- [ ] Create `lib/payload.ts` — fetch helper with locale param, typed responses, revalidation
-- [ ] Replace `lib/graphql.ts` usage in `lib/data.ts`
-- [ ] Environment variables: `PAYLOAD_API_URL`, `PAYLOAD_API_KEY` (if needed)
+- [x] Create `lib/payload.ts` — fetch helper with locale param, typed responses, revalidation
+- [x] Replace `lib/graphql.ts` usage in `lib/data.ts`
+- [x] Environment variables: `PAYLOAD_API_URL`, `PAYLOAD_API_KEY` (if needed)
 
 ### 2.2 TypeScript models
 
-- [ ] Extend `types/artwork.ts` to match ACH tab groups (`ach-schema-and-build.md` Part 2):
+- [x] Extend `types/artwork.ts` to match ACH tab groups (`ach-schema-and-build.md` Part 2):
   - Map & tour: `mapPresence`, `lat`, `lng`, `cityPlaceholderColor`, `overlayColors`, `overlayRects`, `tourStopCopy`
   - Source photograph group
   - Stories: `olderStory`, `newerStory`, `keyHistoricalDates`
   - Reveal slider: `transferImage`, `sliderAxis`
   - AR: `arEnabled`, `arVideos`, `arMarkerFile`, etc.
   - MoP: `imageCaptureLabel`, `triptychPosition`, `availabilityStatus`, `triptych` relation
-- [ ] Add `types/triptych.ts`, `types/series.ts`, `types/homePage.ts` for singleton sections
+- [x] Add `types/triptych.ts`, `types/series.ts`, `types/homePage.ts` for singleton sections
 
 ### 2.3 Data fetching functions
 
-- [ ] `getArtworksLite()` — map/list (slug, title, lat/lng, thumbnail, overlayColors, city, series, mapPresence)
-- [ ] `getArtworkBySlug(slug, locale)` — full artwork page payload
-- [ ] `getTriptychByCity(city, locale)` — triptych + 3 panel artworks + commerce fields
-- [ ] `getMoPSeriesOverview(locale)` — all triptychs for series page
-- [ ] `getHomePageSections(locale)` — HomePage singleton
-- [ ] `getExperiencePage(locale)` — ExperiencePage singleton
+- [x] `getArtworksLite()` — map/list (slug, title, lat/lng, thumbnail, overlayColors, city, series, mapPresence)
+- [x] `getArtworkBySlug(slug, locale)` — full artwork page payload
+- [x] `getTriptychByCity(city, locale)` — triptych + 3 panel artworks + commerce fields
+- [x] `getMoPSeriesOverview(locale)` — all triptychs for series page
+- [x] `getHomePageSections(locale)` — HomePage singleton
+- [x] `getExperiencePage(locale)` — ExperiencePage singleton
 
 **Acceptance:** Home page and artwork detail load from Payload with Berlin triptych panel data available.
 

@@ -1,3 +1,5 @@
+import type { AchFields } from './ach'
+
 export interface ArtworkSize {
     sourceUrl: string;
     height: string;
@@ -76,6 +78,8 @@ export interface FeaturedImage {
 export interface Artwork {
     slug: string;
     artworkFields: ArtworkFields;
+    /** ACH tab fields from Payload — populated when using Payload API. */
+    ach?: AchFields;
     colorfulFields?: ColorfulFields;
     title: string;
     content?: string;
@@ -83,6 +87,8 @@ export interface Artwork {
     id: string;
     date: string;
     featuredImage?: FeaturedImage;
+    seriesSlug?: string;
+    triptychSlug?: string;
     index?: number;
 }
 

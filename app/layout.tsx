@@ -1,10 +1,11 @@
 // app/layout.tsx
 import './globals.css'
 import type { Metadata } from 'next'
+import { barlow, limelight, bodyFontClassName } from '@/lib/fonts'
 
 export const metadata: Metadata = {
   title: 'A Colorful History',
-  description: '...',
+  description: 'Painting, photography and history — Bernard Bolter',
 }
 
 export default function RootLayout({
@@ -13,8 +14,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${barlow.variable} ${limelight.variable}`}
+    >
+      <body className={`${bodyFontClassName} antialiased`}>{children}</body>
     </html>
   )
 }
