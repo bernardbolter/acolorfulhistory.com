@@ -34,9 +34,6 @@ interface ArtworkPageProps {
 
 const ARCHIVE_ARTWORK_BASE = 'https://bernardbolter.com'
 
-/** Preview: show every MiniNav icon. Flip to false to restore data gating. */
-const PREVIEW_ALL_MINI_NAV = true
-
 export default function ArtworkPage({
   artwork,
   triptychPanels = [],
@@ -126,10 +123,10 @@ export default function ArtworkPage({
               />
             </div>
             <MiniNav
-              showSlider={PREVIEW_ALL_MINI_NAV || hasReveal}
-              showAr={PREVIEW_ALL_MINI_NAV || Boolean(ach?.arEnabled)}
-              showMagnifier={PREVIEW_ALL_MINI_NAV || Boolean(imageUrl)}
-              showShare={PREVIEW_ALL_MINI_NAV || Boolean(ach?.shareDescription?.trim())}
+              showSlider={hasReveal}
+              showAr={Boolean(ach?.arEnabled)}
+              showMagnifier={Boolean(imageUrl)}
+              showShare={Boolean(ach?.shareDescription?.trim())}
               overlayColors={ach?.overlayColors}
               onSlider={() => setRevealOpen(true)}
               onAr={handleAr}

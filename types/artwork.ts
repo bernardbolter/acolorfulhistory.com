@@ -63,8 +63,6 @@ export interface Artwork {
   primaryImageUrl?: string
   /** Payload `sizes.thumbnail` (300px square) when present. */
   primaryImageThumbnailUrl?: string;
-  /** 1×1 PNG blurDataURL for Next.js Image placeholder (computed server-side). */
-  placeholderBlurDataURL?: string;
   yearCreated?: number;
     createdAt?: string;
     triptychSlug?: string;

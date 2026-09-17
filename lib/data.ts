@@ -137,11 +137,10 @@ export async function getTriptychPanelsForArtwork(
   const docs = await payloadFindDocs<PayloadArtworkDocument>('artworks', {
     locale: normalizedLocale,
     searchParams: {
-      depth: 1,
+      ...buildSiteSeriesWhereParams(seriesSlug),
+      depth: 2,
       limit: 12,
-      'where[and][0][series.slug][equals]': seriesSlug,
-      'where[and][1][ach.mop.triptychPosition][exists]': true,
-      'where[and][2][status][equals]': 'published',
+      'where[ach.mop.triptychPosition][exists]': true,
     },
     tags: [`triptych-siblings-${seriesSlug}`],
     silent: true,

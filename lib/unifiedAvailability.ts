@@ -3,7 +3,7 @@ import type { Artwork } from '@/types/artwork'
 import type { PayloadArtworkDocument } from '@/types/payload'
 
 /** Visitor-facing availability — one label regardless of backing schema field. */
-export type UnifiedAvailability = 'available' | 'sold' | 'prints-only'
+export type UnifiedAvailability = 'available' | 'sold' | 'not-for-sale' | 'on-loan' | 'prints-only'
 
 const ARCHIVE_SOLD_STATUSES = new Set([
   'sold',
@@ -22,9 +22,16 @@ function resolveUnifiedAvailability(
   if (achStatus === 'sold') return 'sold'
 
   if (archiveStatus === 'available') return 'available'
+  // Not a sale — the archive record just isn't offered. Checked ahead of the
+  // ARCHIVE_SOLD_STATUSES set below, which still contains 'not-for-sale' (shared
+  // with getStatusBadgeAvailability's badge mapping, intentionally untouched here).
+  if (archiveStatus === 'not-for-sale') return 'not-for-sale'
+  if (archiveStatus === 'on-loan') return 'on-loan'
   if (archiveStatus && ARCHIVE_SOLD_STATUSES.has(archiveStatus)) return 'sold'
 
-  return 'available'
+  // Unrecognized or missing status — fail closed. This is not the same claim as
+  // 'sold': it says the record's status is unclear, not that a sale happened.
+  return 'not-for-sale'
 }
 
 /** Raw Payload doc — for facet extraction without full Artwork mapping. */
@@ -62,7 +69,7 @@ export function artworkMatchesAvailabilityFilter(
  */
 export function getStatusBadgeAvailability(
   artwork: Artwork
-): AchAvailabilityStatus | undefined {
+): AchAvailabilityStatus | 'not-for-sale' | 'on-loan' | undefined {
   const ach = artwork.ach?.availabilityStatus
   if (
     ach === 'original-available' ||
@@ -77,6 +84,10 @@ export function getStatusBadgeAvailability(
     return archive
   }
   if (archive === 'available') return 'original-available'
+  // Checked ahead of the ARCHIVE_SOLD_STATUSES set below (which still contains
+  // both), same reasoning as resolveUnifiedAvailability: neither is a sale.
+  if (archive === 'not-for-sale') return 'not-for-sale'
+  if (archive === 'on-loan') return 'on-loan'
   if (archive && ARCHIVE_SOLD_STATUSES.has(archive)) return 'sold'
   return undefined
 }

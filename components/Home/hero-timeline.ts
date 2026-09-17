@@ -66,9 +66,6 @@ export function photoRestTransform(photoRect: HeroPhotoRect): {
   }
 }
 
-/** Behind a flag per brief-hero-list-system §8 — keep off until validated. */
-export const ENABLE_HERO_UNPAINT_ON_EXIT = false
-
 export interface HeroTimelineRefs {
   stage: HTMLElement
   photo: HTMLElement

@@ -185,9 +185,15 @@ contradiction table in `addendum-docs-inventory.md` §3.
 - **Read-only audit before anything wide.** The pattern here is
   `claude_*-prompt.md` → `addendum-*.md`: an audit reports findings and changes
   nothing. If an audit finds a bug, it records it. A later scoped task fixes it.
-- **The floor for verification is `npm run build` plus `npm run lint`.** `next build`
-  type-checks, so a clean build is a clean typecheck; `npx tsc --noEmit` is the
-  faster loop while iterating. There are no tests.
+- **The floor for verification is a clean `npm run build`, plus `npm run lint` adding
+  no new findings.** `next build` type-checks, so a clean build is a clean typecheck;
+  `npx tsc --noEmit` is the faster loop while iterating. There are no tests.
+  **Lint is not clean on `main`** — as of 17 Sep 2026 it reports 11 errors and 7
+  warnings, mostly `react-hooks/set-state-in-effect` in `NavPersistentRow.tsx`,
+  `HistoryProvider.tsx` and `RevealSlider.tsx`. That is pre-existing tech debt, not
+  yours. So the test is comparative: stash your changes, run lint on the unmodified
+  branch, and confirm the counts match. Never report lint as "clean"; report it as
+  "no new findings" with the baseline stated.
 - **Ask before resolving anything in Open decisions above.**
 - **Never print or commit values from `.env.local`.** Variables not in
   `.env.example`: `NEXT_PUBLIC_PAYLOAD_API_URL`, `VENDURE_SHOP_API`.
