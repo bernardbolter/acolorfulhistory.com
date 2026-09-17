@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Compositor — A Colorful History</title>
+<style>
+  :root {
+    --ink: #1A1A1C; --paper: #F4F2EE; --gate: #2A1545;
+    --line: #D8D4CC; --warn: #B8742A;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--paper); color: var(--ink);
+    display: grid; grid-template-columns: 1fr 360px; height: 100vh;
+  }
+  #stage {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: repeating-conic-gradient(#ECEAE4 0 25%, var(--paper) 0 50%) 0 0 / 24px 24px;
+  }
+  #stage.empty::after { content: "Load a heroFields.json (shapes) first"; color: #8A867E; }
+  canvas { max-width: 100%; max-height: 100%; display: block; }
+  #panel {
+    border-left: 2px solid var(--ink); padding: 20px;
+    display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
+    background: var(--paper);
+  }
+  h1 { font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
+  h1 span { color: var(--gate); }
+  label { display: block; font-size: 11px; text-transform: uppercase;
+          letter-spacing: .08em; color: #6B675F; margin-bottom: 4px; }
+  input[type=text], input[type=file] {
+    width: 100%; padding: 6px 8px; border: 1px solid var(--ink);
+    background: #fff; font: inherit;
+  }
+  button {
+    font: inherit; padding: 8px 12px; border: 1px solid var(--ink);
+    background: #fff; cursor: pointer;
+  }
+  button:hover { background: var(--ink); color: var(--paper); }
+  button.primary { background: var(--gate); color: #fff; border-color: var(--gate); }
+  button.primary:hover { background: var(--ink); border-color: var(--ink); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--gate); outline-offset: 2px; }
+  .field-row { display: grid; grid-template-columns: 20px 1fr; gap: 8px; align-items: center;
+               padding: 4px 0; font-size: 12px; }
+  .swatch { width: 16px; height: 16px; border: 1px solid var(--ink); }
+  #rectReadout { font-size: 12px; background: #fff; border: 1px solid var(--line);
+                 padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  #rectReadout b { font-weight: 700; }
+  .hint { font-size: 12px; color: #8A867E; }
+  .warn { font-size: 12px; color: var(--warn); }
+  footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+  .upload-block { display: flex; flex-direction: column; gap: 6px; padding: 10px;
+                   border: 1px solid var(--line); background: #fff; }
+</style>
+</head>
+<body>
+
+<div id="stage" class="empty"><canvas id="canvas" hidden></canvas></div>
+
+<aside id="panel">
+  <h1>Compositor <span>· fit the photo</span></h1>
+
+  <div class="upload-block">
+    <label for="fieldsInput">1 · Load heroFields.json (already-extracted shapes)</label>
+    <input type="file" id="fieldsInput" accept="application/json">
+  </div>
+
+  <div class="upload-block">
+    <label for="photoInput">2 · Load the source photograph</label>
+    <input type="file" id="photoInput">
+  </div>
+
+  <div>
+    <p class="hint">Drag the rectangle to move it, drag a corner to resize. It shows the real photo clipped live — fit it into the gap the shapes leave.</p>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:6px;">
+    <label for="opacityInput">Photo opacity <span id="opacityVal">70%</span></label>
+    <input type="range" id="opacityInput" min="0" max="100" value="70" style="width:100%;">
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:6px;">
+    <label for="rotInput">Rotation (degrees)</label>
+    <input type="number" id="rotInput" value="0" step="1" style="width:100%;">
+  </div>
+
+  <div id="rectReadout">
+    <span>x <b id="rx">—</b></span><span>y <b id="ry">—</b></span>
+    <span>w <b id="rw">—</b></span><span>h <b id="rh">—</b></span>
+    <span>rot <b id="rrot">—</b></span>
+  </div>
+
+  <div>
+    <label>Fields loaded (unchanged, from extraction)</label>
+    <div id="fieldsList"></div>
+  </div>
+
+  <div id="statusLog" style="font-size:11px; background:#fff; border:1px solid var(--line); padding:8px; max-height:120px; overflow-y:auto; white-space:pre-wrap; color:#6B675F;">Waiting for files…</div>
+
+  <footer>
+    <p class="warn" id="warnMsg" hidden></p>
+    <button class="primary" id="exportBtn">Download heroFields.json with photoRect</button>
+    <p class="hint">Combines the loaded field shapes (untouched) with the photoRect from wherever you left the rectangle.</p>
+  </footer>
+</aside>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let fieldsData = null;   // parsed heroFields.json
+  let W = 0, H = 0;        // canvas natural size, from imageSize in the json
+  let photoImg = null;
+  let rect = { x: 0.3, y: 0.35, w: 0.4, h: 0.3, rot: 0 }; // normalized, rot in degrees
+
+  const HANDLE = 14; // px hit-radius for corner handles at natural scale (scaled by draw)
+
+  function log(msg) {
+    const el = document.getElementById('statusLog');
+    const time = new Date().toLocaleTimeString();
+    el.textContent = `[${time}] ${msg}\n` + el.textContent;
+  }
+
+  document.getElementById('fieldsInput').onchange = e => {
+    log('fieldsInput change event fired');
+    const f = e.target.files[0]; if (!f) { log('no file in selection'); return; }
+    log(`reading ${f.name} (${f.type || 'no type reported'}, ${f.size} bytes)`);
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        fieldsData = JSON.parse(reader.result);
+        W = fieldsData.imageSize ? fieldsData.imageSize[0] : 1000;
+        H = fieldsData.imageSize ? fieldsData.imageSize[1] : 1000;
+        if (fieldsData.photoRect) rect = { ...fieldsData.photoRect };
+        canvas.width = W; canvas.height = H;
+        canvas.hidden = false; stage.classList.remove('empty');
+        renderFieldsList();
+        renderAll();
+        log(`parsed OK — ${(fieldsData.fields||[]).length} fields, canvas ${W}x${H}`);
+      } catch (err) {
+        log(`JSON parse failed: ${err.message}`);
+        warn('Could not parse that JSON — expected a heroFields.json from extract_hero_fields.py or auto_seed_fields.py.');
+      }
+    };
+    reader.onerror = () => log(`FileReader error: ${reader.error}`);
+    reader.readAsText(f);
+  };
+
+  document.getElementById('photoInput').onchange = e => {
+    log('photoInput change event fired');
+    const f = e.target.files[0];
+    if (!f) { log('no file in selection (dialog was likely cancelled, or the OS filtered it out)'); warn('No file was selected.'); return; }
+    log(`selected ${f.name} (${f.type || 'no type reported by browser'}, ${f.size} bytes)`);
+
+    const looksLikeWebp = /\.webp$/i.test(f.name);
+    const properlyTyped = (looksLikeWebp && f.type !== 'image/webp')
+      ? new Blob([f], { type: 'image/webp' })
+      : f;
+    if (properlyTyped !== f) log('re-typed blob as image/webp (browser had reported a different/missing type)');
+
+    tryDecode(properlyTyped, f.name);
+  };
+
+  function tryDecode(blob, filename) {
+    log(`attempting <img> decode of ${filename}`);
+    const url = URL.createObjectURL(blob);
+    const im = new Image();
+    im.onload = () => { photoImg = im; log(`<img> decode OK — ${im.naturalWidth}x${im.naturalHeight}`); renderAll(); };
+    im.onerror = () => {
+      log('<img> decode failed, trying createImageBitmap fallback');
+      if (window.createImageBitmap) {
+        createImageBitmap(blob).then(bitmap => {
+          photoImg = bitmap;
+          log(`createImageBitmap decode OK — ${bitmap.width}x${bitmap.height}`);
+          renderAll();
+        }).catch(err => {
+          log(`createImageBitmap also failed: ${err.message || err}`);
+          warn(`This browser genuinely can't decode "${filename}". Re-export it as .jpg or .png and load that instead.`);
+        });
+      } else {
+        log('createImageBitmap not available in this browser');
+        warn(`Could not decode "${filename}". Try re-exporting as .jpg or .png.`);
+      }
+    };
+    im.src = url;
+  }
+
+  function warn(msg) {
+    const w = document.getElementById('warnMsg');
+    w.textContent = msg; w.hidden = false;
+    setTimeout(() => { w.hidden = true; }, 4000);
+  }
+
+  function hexToRgba(hex, alpha) {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function renderAll() {
+    if (!fieldsData) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#F4F2EE';
+    ctx.fillRect(0, 0, W, H);
+
+    // pass 1: draw extracted field shapes, filled, at their real positions
+    drawFieldFills();
+
+    // pass 2 (rotated): the photo, clipped to the rect, at current opacity
+    const rx = rect.x * W, ry = rect.y * H, rw = rect.w * W, rh = rect.h * H;
+    const cx = rx + rw / 2, cy = ry + rh / 2;
+    const rotRad = (rect.rot || 0) * Math.PI / 180;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotRad);
+    ctx.translate(-cx, -cy);
+
+    if (photoImg) {
+      ctx.save();
+      ctx.globalAlpha = (Number(document.getElementById('opacityInput').value) || 70) / 100;
+      ctx.beginPath();
+      ctx.rect(rx, ry, rw, rh);
+      ctx.clip();
+      const iw = photoImg.naturalWidth || photoImg.width;
+      const ih = photoImg.naturalHeight || photoImg.height;
+      const scale = Math.max(rw / iw, rh / ih);
+      const dw = iw * scale, dh = ih * scale;
+      const dx = rx + (rw - dw) / 2, dy = ry + (rh - dh) / 2;
+      ctx.drawImage(photoImg, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    // rect outline + corner handles (rotated along with the photo)
+    ctx.strokeStyle = '#2A1545';
+    ctx.lineWidth = Math.max(2, W * 0.003);
+    ctx.setLineDash([W * 0.01, W * 0.006]);
+    ctx.strokeRect(rx, ry, rw, rh);
+    ctx.setLineDash([]);
+    [[rx,ry],[rx+rw,ry],[rx,ry+rh],[rx+rw,ry+rh]].forEach(([x,y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(5, W*0.007), 0, Math.PI*2);
+      ctx.fillStyle = '#2A1545'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+    });
+
+    ctx.restore(); // end rotated context
+
+    // pass 3: field OUTLINES redrawn on top, unrotated, un-clipped — so the
+    // real field boundaries stay visible as an alignment guide even where
+    // the photo covers them underneath
+    drawFieldOutlines();
+
+    updateReadout();
+  }
+
+  function drawFieldFills() {
+    (fieldsData.fields || []).forEach(f => {
+      if (!f.polygon) return;
+      ctx.beginPath();
+      f.polygon.forEach(([x, y], i) => {
+        const px = x * W, py = y * H;
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.closePath();
+      ctx.fillStyle = f.hex;
+      ctx.fill();
+    });
+  }
+
+  function drawFieldOutlines() {
+    (fieldsData.fields || []).forEach(f => {
+      if (!f.polygon) return;
+      ctx.beginPath();
+      f.polygon.forEach(([x, y], i) => {
+        const px = x * W, py = y * H;
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.lineWidth = Math.max(1, W * 0.0025);
+      ctx.stroke();
+    });
+  }
+
+  function updateReadout() {
+    document.getElementById('rx').textContent = rect.x.toFixed(4);
+    document.getElementById('ry').textContent = rect.y.toFixed(4);
+    document.getElementById('rw').textContent = rect.w.toFixed(4);
+    document.getElementById('rh').textContent = rect.h.toFixed(4);
+    document.getElementById('rrot').textContent = (rect.rot || 0).toFixed(1) + '°';
+  }
+
+  document.getElementById('opacityInput').oninput = e => {
+    document.getElementById('opacityVal').textContent = e.target.value + '%';
+    renderAll();
+  };
+  document.getElementById('rotInput').oninput = e => {
+    rect.rot = Number(e.target.value) || 0;
+    renderAll();
+  };
+
+  function renderFieldsList() {
+    const box = document.getElementById('fieldsList');
+    box.innerHTML = '';
+    (fieldsData.fields || []).forEach(f => {
+      const row = document.createElement('div');
+      row.className = 'field-row';
+      row.innerHTML = `<div class="swatch" style="background:${f.hex}"></div><span>${f.name}</span>`;
+      box.appendChild(row);
+    });
+  }
+
+  // ---------- drag / resize interaction ----------
+  let dragMode = null; // null | 'move' | 'nw' | 'ne' | 'sw' | 'se'
+  let dragStart = null;
+  let rectStart = null;
+
+  function toNatural(e) {
+    const r = canvas.getBoundingClientRect();
+    return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H];
+  }
+
+  // rotate a point (px,py) around (cx,cy) by angleRad
+  function rotatePoint(px, py, cx, cy, angleRad) {
+    const dx = px - cx, dy = py - cy;
+    const cos = Math.cos(angleRad), sin = Math.sin(angleRad);
+    return [cx + dx * cos - dy * sin, cy + dx * sin + dy * cos];
+  }
+
+  function hitTest(px, py) {
+    const rx = rect.x*W, ry = rect.y*H, rw = rect.w*W, rh = rect.h*H;
+    const cx = rx + rw/2, cy = ry + rh/2;
+    const rotRad = (rect.rot || 0) * Math.PI / 180;
+    // bring the world-space mouse point into the rect's local (unrotated)
+    // frame by rotating it backward around the rect's center
+    const [lx, ly] = rotatePoint(px, py, cx, cy, -rotRad);
+
+    const hr = Math.max(10, W*0.012);
+    const corners = { nw:[rx,ry], ne:[rx+rw,ry], sw:[rx,ry+rh], se:[rx+rw,ry+rh] };
+    for (const [key,[ccx,ccy]] of Object.entries(corners)) {
+      if (Math.hypot(lx-ccx, ly-ccy) < hr) return key;
+    }
+    if (lx > rx && lx < rx+rw && ly > ry && ly < ry+rh) return 'move';
+    return null;
+  }
+
+  canvas.addEventListener('mousedown', e => {
+    if (!fieldsData) return;
+    const [px, py] = toNatural(e);
+    dragMode = hitTest(px, py);
+    dragStart = [px, py];
+    rectStart = { ...rect };
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!dragMode || !fieldsData) return;
+    const [px, py] = toNatural(e);
+
+    if (dragMode === 'move') {
+      // pure translation — rotation doesn't affect this, world delta applies directly
+      const dx = (px - dragStart[0]) / W, dy = (py - dragStart[1]) / H;
+      rect.x = clamp(rectStart.x + dx, 0, 1 - rect.w);
+      rect.y = clamp(rectStart.y + dy, 0, 1 - rect.h);
+    } else {
+      // corner resize — rotate the world-space delta into the rect's own
+      // local (unrotated) axes before applying it, otherwise dragging a
+      // corner on a rotated rect would resize along the wrong direction
+      const rotRad = (rectStart.rot || 0) * Math.PI / 180;
+      const wdx = px - dragStart[0], wdy = py - dragStart[1];
+      const cos = Math.cos(-rotRad), sin = Math.sin(-rotRad);
+      const ldx = (wdx * cos - wdy * sin) / W;
+      const ldy = (wdx * sin + wdy * cos) / H;
+
+      let { x, y, w, h } = rectStart;
+      if (dragMode.includes('n')) { y = rectStart.y + ldy; h = rectStart.h - ldy; }
+      if (dragMode.includes('s')) { h = rectStart.h + ldy; }
+      if (dragMode.includes('w')) { x = rectStart.x + ldx; w = rectStart.w - ldx; }
+      if (dragMode.includes('e')) { w = rectStart.w + ldx; }
+      if (w > 0.02 && h > 0.02) { rect.x = x; rect.y = y; rect.w = w; rect.h = h; }
+    }
+    renderAll();
+  });
+
+  window.addEventListener('mouseup', () => { dragMode = null; });
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  document.getElementById('exportBtn').onclick = () => {
+    if (!fieldsData) { warn('Load a heroFields.json first.'); return; }
+    const out = {
+      ...fieldsData,
+      photoRect: {
+        x: +rect.x.toFixed(4), y: +rect.y.toFixed(4),
+        w: +rect.w.toFixed(4), h: +rect.h.toFixed(4),
+        rot: +(rect.rot || 0).toFixed(1)
+      }
+    };
+    const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (fieldsData.artwork || 'artwork') + '.heroFields.json';
+    a.click();
+  };
+})();
+</script>
+</body>
+</html>

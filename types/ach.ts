@@ -1,4 +1,5 @@
 import type { OverlayRect } from './overlay'
+import type { HeroFieldsData } from './hero'
 
 export type SliderAxis = 'horizontal' | 'vertical'
 export type TriptychPosition = 'I' | 'II' | 'III'
@@ -51,6 +52,8 @@ export interface AchFields {
   keyHistoricalDates?: KeyHistoricalDate[]
   olderStory?: string
   newerStory?: string
+  /** Artist-authored share-card copy. Share icon + og:description only when non-empty. */
+  shareDescription?: string
   fieldRecordingUrl?: string
   transferImageUrl?: string
   sliderAxis?: SliderAxis
@@ -65,4 +68,10 @@ export interface AchFields {
   availabilityStatus?: AchAvailabilityStatus
   triptychId?: string
   triptychSlug?: string
+  /** Homepage self-painting hero — brief-11 / brief-hero-list-system §4 */
+  hero?: {
+    heroEligible?: boolean
+    heroFields?: HeroFieldsData | null
+    heroPhotoUrl?: string
+  }
 }

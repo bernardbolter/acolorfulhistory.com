@@ -65,6 +65,23 @@ export function relationSlug(
   return relation.slug
 }
 
+export function relationTitle(relation: unknown): string | undefined {
+  return relationName(relation)
+}
+
+/**
+ * Display name for a Payload relation or Series/Triptych-like doc.
+ * Live Series uses `name` (`useAsTitle: 'name'`); `title` is often absent.
+ * Always prefer `name` — reading `title` alone blanked the MoP overview h1.
+ */
+export function relationName(relation: unknown): string | undefined {
+  if (!relation || typeof relation !== 'object') return undefined
+  const record = relation as { name?: unknown; title?: unknown }
+  if (typeof record.name === 'string' && record.name.trim()) return record.name
+  if (typeof record.title === 'string' && record.title.trim()) return record.title
+  return undefined
+}
+
 export function relationId(
   relation: { id?: string } | string | null | undefined
 ): string | undefined {

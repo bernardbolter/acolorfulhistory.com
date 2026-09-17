@@ -29,7 +29,7 @@ export default function ArtworkImage({ artwork, className = '' }: ArtworkImagePr
           alt={artwork.title}
           fill
           className="object-contain"
-          sizes="(max-width: 769px) 100vw, 65vw"
+          sizes="(min-width: 769px) 75vw, 92vw"
           priority
           onLoad={() => setImageLoaded(true)}
         />

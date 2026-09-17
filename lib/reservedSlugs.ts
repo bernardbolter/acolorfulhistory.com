@@ -3,7 +3,9 @@ import { routing } from '@/i18n/routing'
 /** Top-level path segments that must not be treated as artwork slugs. */
 export const RESERVED_SLUGS = new Set([
   'series',
+  'map',
   'experience',
+  'neighborhood',
   'about',
   'store',
   'fieldnotes',

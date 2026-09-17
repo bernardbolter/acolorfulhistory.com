@@ -1,9 +1,15 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { useRouter } from '@/i18n/routing'
 import { pickAccentColor } from '@/helpers/seededRandom'
 import { isARSupported } from '@/lib/device'
+import { getStatusBadgeAvailability } from '@/lib/unifiedAvailability'
+import {
+  listImageOrientationClass,
+  listImageStyleVars,
+} from '@/lib/listImageSizing'
 import ArtworkImage from '@/components/Artwork/ArtworkImage'
 import TitleBlock from '@/components/Artwork/TitleBlock'
 import MiniNav from '@/components/Artwork/MiniNav'
@@ -26,6 +32,11 @@ interface ArtworkPageProps {
   triptychCity?: string
 }
 
+const ARCHIVE_ARTWORK_BASE = 'https://bernardbolter.com'
+
+/** Preview: show every MiniNav icon. Flip to false to restore data gating. */
+const PREVIEW_ALL_MINI_NAV = true
+
 export default function ArtworkPage({
   artwork,
   triptychPanels = [],
@@ -38,16 +49,17 @@ export default function ArtworkPage({
 
   const [revealOpen, setRevealOpen] = useState(false)
   const [zoomOpen, setZoomOpen] = useState(false)
+  /** Spec: title starts in front; click title → behind; click image → front. */
+  const [titleFront, setTitleFront] = useState(true)
 
-  const hasReveal = Boolean(
-    imageUrl && (ach?.source?.sourceImageUrl || ach?.transferImageUrl)
-  )
+  const hasReveal = Boolean(imageUrl && ach?.transferImageUrl)
 
   const handleShare = useCallback(async () => {
     const url = window.location.href
+    const shareDescription = artwork.ach?.shareDescription?.trim()
     const shareData = {
       title: artwork.title,
-      text: artwork.title,
+      text: shareDescription || artwork.title,
       url,
     }
 
@@ -55,13 +67,13 @@ export default function ArtworkPage({
       try {
         await navigator.share(shareData)
         return
-      } catch {
-        // fall through to clipboard
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return
       }
     }
 
     await navigator.clipboard.writeText(url)
-  }, [artwork.title])
+  }, [artwork.ach?.shareDescription, artwork.title])
 
   const handleAr = useCallback(() => {
     if (isARSupported()) {
@@ -71,58 +83,110 @@ export default function ArtworkPage({
     }
   }, [artwork.slug, router])
 
+  const city = artwork.artworkFields.city
+  const status = getStatusBadgeAvailability(artwork)
+  const showTriptychNav = triptychPanels.length > 0 || Boolean(artwork.triptychSlug)
+  const orientationClass = listImageOrientationClass(
+    artwork.artworkFields.orientation
+  )
+  const imageStyleVars = listImageStyleVars(artwork)
+
   return (
-    <article className="min-h-screen bg-surface-page">
-      <FieldZone className="artwork-field-zone relative">
-        <div className="artwork-image-wrap">
-          <ArtworkImage artwork={artwork} />
-          <TitleBlock title={artwork.title} slug={artwork.slug} />
-          <MiniNav
-            showSlider={hasReveal}
-            showAr={Boolean(ach?.arEnabled || artwork.colorfulFields?.ar)}
-            showMagnifier={Boolean(imageUrl)}
-            onSlider={() => setRevealOpen(true)}
-            onAr={handleAr}
-            onMagnifier={() => setZoomOpen(true)}
-            onShare={handleShare}
-          />
+    <article className="artwork-page min-h-screen bg-surface-page">
+      <FieldZone className="artwork-field-zone">
+        <div className="artwork-viewport">
+          <div
+            className={`artwork-stage ${orientationClass}`}
+            style={imageStyleVars as CSSProperties}
+          >
+            <div
+              className="artwork-image-wrap"
+              style={{
+                aspectRatio: String(
+                  artwork.aspectRatio ||
+                    artwork.artworkFields.proportion ||
+                    1
+                ),
+              }}
+              onClick={() => setTitleFront(true)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  setTitleFront(true)
+                }
+              }}
+              role="presentation"
+            >
+              <ArtworkImage artwork={artwork} />
+              <TitleBlock
+                title={artwork.title}
+                city={city}
+                slug={artwork.slug}
+                front={titleFront}
+                onToggle={() => setTitleFront((value) => !value)}
+              />
+            </div>
+            <MiniNav
+              showSlider={PREVIEW_ALL_MINI_NAV || hasReveal}
+              showAr={PREVIEW_ALL_MINI_NAV || Boolean(ach?.arEnabled)}
+              showMagnifier={PREVIEW_ALL_MINI_NAV || Boolean(imageUrl)}
+              showShare={PREVIEW_ALL_MINI_NAV || Boolean(ach?.shareDescription?.trim())}
+              overlayColors={ach?.overlayColors}
+              onSlider={() => setRevealOpen(true)}
+              onAr={handleAr}
+              onMagnifier={() => setZoomOpen(true)}
+              onShare={handleShare}
+            />
+          </div>
         </div>
       </FieldZone>
 
-      <FaultLine />
+      <FaultLine className="artwork-fault-line" />
 
       <DenseZone className="max-w-4xl mx-auto artwork-dense-zone">
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <StatusBadge
-            status={ach?.availabilityStatus}
-            slug={artwork.slug}
-            overlayColors={ach?.overlayColors}
-          />
-        </div>
-
-        <InfoTab fields={artwork.artworkFields} source={ach?.source} />
+        <InfoTab
+          title={artwork.title}
+          year={artwork.artworkFields.year || artwork.yearCreated}
+          medium={artwork.artworkFields.medium}
+          widthCm={artwork.widthCm || artwork.artworkFields.width}
+          heightCm={artwork.heightCm || artwork.artworkFields.height}
+          seriesName={artwork.seriesName}
+          triptychPosition={ach?.triptychPosition}
+          source={ach?.source}
+        />
 
         <StoryColumns
           olderStory={ach?.olderStory}
           newerStory={ach?.newerStory}
         />
 
-        <HistoricalDatesTimeline
-          dates={ach?.keyHistoricalDates}
-          slug={artwork.slug}
-          overlayColors={ach?.overlayColors}
-        />
+        <ARLink slug={artwork.slug} arEnabled={ach?.arEnabled} />
 
-        <ARLink slug={artwork.slug} arEnabled={ach?.arEnabled || artwork.colorfulFields?.ar} />
+        <HistoricalDatesTimeline dates={ach?.keyHistoricalDates} />
 
-        {(triptychCity || artwork.triptychSlug) && (
+        {showTriptychNav && (
           <TriptychLink
-            city={triptychCity || artwork.artworkFields.city}
+            city={triptychCity || city}
             triptychSlug={artwork.triptychSlug}
             panels={triptychPanels}
             currentSlug={artwork.slug}
           />
         )}
+
+        <div className="artwork-status-row">
+          <StatusBadge
+            status={status}
+            slug={artwork.slug}
+            overlayColors={ach?.overlayColors}
+          />
+          <a
+            href={`${ARCHIVE_ARTWORK_BASE}/${artwork.slug}`}
+            className="artwork-archive-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Full archive record →
+          </a>
+        </div>
       </DenseZone>
 
       <RevealSlider

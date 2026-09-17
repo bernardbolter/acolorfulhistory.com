@@ -1,6 +1,6 @@
 import { mapPayloadArtworkToArtwork } from '@/lib/mappers/artworkFromPayload'
 import { payloadRichTextToHtml } from '@/lib/mappers/richText'
-import { relationSlug } from '@/lib/mappers/media'
+import { relationName, relationSlug } from '@/lib/mappers/media'
 import type { MoPSeriesOverview, Series } from '@/types/series'
 import type { Triptych } from '@/types/triptych'
 import type {
@@ -63,10 +63,14 @@ export function mapPayloadSeriesToSeries(doc: PayloadSeriesDocument): Series {
       ).filter(Boolean)
     : undefined
 
+  // Live Series uses `name` (useAsTitle); `title` is absent. Same pattern as
+  // artwork seriesName via relationName() — never read doc.title alone.
+  const title = relationName(doc) || doc.slug
+
   return {
     id: doc.id,
     slug: doc.slug,
-    title: doc.title,
+    title,
     description: payloadRichTextToHtml(doc.description),
     period: doc.period,
     cities,

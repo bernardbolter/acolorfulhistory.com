@@ -18,7 +18,7 @@ export default async function ExperiencePageShell({ page }: ExperiencePageShellP
           {t('augmentedReality')}
         </h1>
         <p className="mt-6 text-body text-text-muted">{t('comingSoon')}</p>
-        <Link href="/series" className="home-cta mt-8 inline-block">
+        <Link href="/" className="home-cta mt-8 inline-block">
           → {t('exploreCollection')}
         </Link>
       </main>

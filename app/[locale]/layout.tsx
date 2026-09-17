@@ -28,7 +28,6 @@ export default async function LocaleLayout({
     artworks = await getArtworksLite(locale)
   } catch (err) {
     console.error('Failed to fetch artworks in [locale]/layout:', err)
-    // Optionally: artworks = [] or fallback data
   }
 
   return (

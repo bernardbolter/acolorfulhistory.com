@@ -19,7 +19,7 @@ export default async function MoPOverviewPage({ overview }: MoPOverviewPageProps
           {t('mediumsOfPerception')}
         </h1>
         <p className="mt-6 text-body text-text-muted">{t('comingSoon')}</p>
-        <Link href="/series" className="home-cta mt-8 inline-block">
+        <Link href="/" className="home-cta mt-8 inline-block">
           → {t('series')}
         </Link>
       </main>
@@ -27,11 +27,14 @@ export default async function MoPOverviewPage({ overview }: MoPOverviewPageProps
   }
 
   const { series, triptychs, mediumsOfWarTriptychs = [] } = overview
+  const heading = series.title?.trim() || t('mediumsOfPerception')
+  const hasTriptychs = triptychs.length > 0
+  const hasMoW = mediumsOfWarTriptychs.length > 0
 
   return (
     <main className="min-h-screen bg-surface-page px-6 pt-28 pb-24 l:px-12">
       <TitleOrnament className="mb-4" />
-      <h1 className="font-display text-artwork-title text-text-primary">{series.title}</h1>
+      <h1 className="font-display text-artwork-title text-text-primary">{heading}</h1>
       {series.description && (
         <div
           className="mt-6 max-w-2xl text-body text-text-dark"
@@ -39,15 +42,19 @@ export default async function MoPOverviewPage({ overview }: MoPOverviewPageProps
         />
       )}
 
-      <section className="mt-12">
-        <ul className="space-y-8">
-          {triptychs.map((triptych) => (
-            <TriptychOverviewRow key={triptych.slug} triptych={triptych} />
-          ))}
-        </ul>
-      </section>
+      {hasTriptychs ? (
+        <section className="mt-12">
+          <ul className="space-y-8">
+            {triptychs.map((triptych) => (
+              <TriptychOverviewRow key={triptych.slug} triptych={triptych} />
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <p className="mt-12 text-body text-text-muted">{t('comingSoon')}</p>
+      )}
 
-      {mediumsOfWarTriptychs.length > 0 && (
+      {hasMoW && (
         <section className="mt-16 pt-8 border-t border-ui-line/20">
           <p className="label-small-caps mb-4">{t('mediumsOfWar')}</p>
           <ul className="space-y-8">

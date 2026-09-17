@@ -47,15 +47,14 @@ export function hasMapLocation(art: Artwork): boolean {
 
 export function getArtworkImageUrl(art: Artwork): string {
   return (
+    art.primaryImageUrl ||
     art.artworkFields?.artworkImage?.mediaItemUrl ||
-    art.featuredImage?.node?.sourceUrl ||
     ''
   )
 }
 
 export function getArtworkProportion(art: Artwork): number {
-  const proportion = art.artworkFields?.proportion
-  if (proportion && proportion > 0) return proportion
+  if (art.aspectRatio && art.aspectRatio > 0) return art.aspectRatio
 
   const width = art.artworkFields?.width
   const height = art.artworkFields?.height

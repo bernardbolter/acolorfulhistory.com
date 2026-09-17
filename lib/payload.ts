@@ -1,7 +1,5 @@
 import type { AppLocale } from '@/lib/mappers/richText'
 
-export type DataSource = 'payload' | 'graphql'
-
 export interface PayloadClientConfig {
   baseUrl: string
   apiKey?: string
@@ -26,15 +24,17 @@ export function getPayloadConfig(): PayloadClientConfig {
   }
 }
 
-export function getDataSource(): DataSource {
-  return getPayloadConfig().enabled ? 'payload' : 'graphql'
-}
-
 export interface PayloadFetchOptions {
   locale?: AppLocale | string
   searchParams?: Record<string, string | number | boolean | undefined>
   revalidate?: number | false
   tags?: string[]
+  /** When true, 404 responses return null without logging an error. */
+  optional?: boolean
+  /** When true, failed responses return null without logging an error. */
+  silent?: boolean
+  /** When true, bypass Next.js fetch cache (required for large Payload list responses). */
+  noStore?: boolean
 }
 
 function buildSearchParams(
@@ -81,14 +81,21 @@ export async function payloadFetch<T>(
   try {
     const res = await fetch(url, {
       headers,
-      next:
-        revalidate === false
-          ? { revalidate: 0 }
-          : { revalidate, tags: options?.tags },
+      ...(options?.noStore
+        ? { cache: 'no-store' as const }
+        : {
+            next:
+              revalidate === false
+                ? { revalidate: 0 }
+                : { revalidate, tags: options?.tags },
+          }),
     })
 
     if (!res.ok) {
-      console.error(`Payload fetch failed: ${res.status} ${res.statusText} — ${url}`)
+      const shouldLog = !(options?.optional && res.status === 404) && !options?.silent
+      if (shouldLog) {
+        console.error(`Payload fetch failed: ${res.status} ${res.statusText} — ${url}`)
+      }
       return null
     }
 

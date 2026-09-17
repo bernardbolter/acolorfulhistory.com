@@ -72,10 +72,11 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-barlow)', 'sans-serif'],
         display: ['var(--font-limelight)', 'cursive'],
+        card: ['var(--font-josefin)', 'sans-serif'],
       },
       fontSize: {
-        'logo-tag': ['0.75rem', { lineHeight: '1', fontWeight: '400' }],
-        'logo-by': ['0.5625rem', { lineHeight: '1', fontWeight: '500' }],
+        'logo-tag': ['0.875rem', { lineHeight: '1.15', fontWeight: '400' }],  // 14px
+        'logo-by': ['0.6875rem', { lineHeight: '1.15', fontWeight: '500' }],  // 11px
         'small-caps': [
           '0.5625rem',
           { lineHeight: '1', fontWeight: '700', letterSpacing: '0.18em' },

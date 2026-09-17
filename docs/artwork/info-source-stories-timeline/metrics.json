@@ -1,0 +1,510 @@
+{
+  "wwiDesktop": {
+    "vw": 1440,
+    "vh": 900,
+    "paintingHeading": "World War One",
+    "paintingRows": [
+      {
+        "dt": "Year",
+        "dd": "2022"
+      },
+      {
+        "dt": "Medium",
+        "dd": "Acrylic Photo Transfer On Canvas"
+      },
+      {
+        "dt": "Dimensions",
+        "dd": "80 × 80 cm"
+      },
+      {
+        "dt": "Series",
+        "dd": "Mediums of Perception · Panel I"
+      }
+    ],
+    "sourceHeading": "Source photograph",
+    "pending": "Source photograph pending",
+    "thumb": false,
+    "caption": null,
+    "sourceRows": [
+      {
+        "dt": "Photographer",
+        "dd": "Unknown"
+      },
+      {
+        "dt": "Technique",
+        "dd": "[PLACEHOLDER] Black and white photography, WWI-era"
+      }
+    ],
+    "infoDisplay": "grid",
+    "infoColumns": "400px 400px",
+    "sourceBorderLeft": "0px",
+    "paintingBorderRight": "1px",
+    "paintingBorderRightColor": "color(srgb 0.466667 0.466667 0.466667 / 0.35)",
+    "dt": {
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.62px",
+      "textTransform": "uppercase",
+      "color": "rgb(119, 119, 119)"
+    },
+    "dd": {
+      "fontSize": "15.2px",
+      "fontWeight": "400",
+      "color": "rgb(58, 63, 74)"
+    },
+    "stories": [
+      {
+        "heading": "The Photograph",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      },
+      {
+        "heading": "The Painting",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      }
+    ],
+    "storyColumns": "380px 380px",
+    "timelinePresent": false,
+    "timeline": {
+      "present": false,
+      "years": [],
+      "events": [],
+      "links": [],
+      "nodeColors": []
+    },
+    "tabs": false,
+    "infoWidth": 800
+  },
+  "wwiMobile": {
+    "vw": 390,
+    "vh": 844,
+    "paintingHeading": "World War One",
+    "paintingRows": [
+      {
+        "dt": "Year",
+        "dd": "2022"
+      },
+      {
+        "dt": "Medium",
+        "dd": "Acrylic Photo Transfer On Canvas"
+      },
+      {
+        "dt": "Dimensions",
+        "dd": "80 × 80 cm"
+      },
+      {
+        "dt": "Series",
+        "dd": "Mediums of Perception · Panel I"
+      }
+    ],
+    "sourceHeading": "Source photograph",
+    "pending": "Source photograph pending",
+    "thumb": false,
+    "caption": null,
+    "sourceRows": [
+      {
+        "dt": "Photographer",
+        "dd": "Unknown"
+      },
+      {
+        "dt": "Technique",
+        "dd": "[PLACEHOLDER] Black and white photography, WWI-era"
+      }
+    ],
+    "infoDisplay": "grid",
+    "infoColumns": "342px",
+    "sourceBorderLeft": "0px",
+    "paintingBorderRight": "0px",
+    "paintingBorderRightColor": "rgb(229, 231, 235)",
+    "dt": {
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.62px",
+      "textTransform": "uppercase",
+      "color": "rgb(119, 119, 119)"
+    },
+    "dd": {
+      "fontSize": "15.2px",
+      "fontWeight": "400",
+      "color": "rgb(58, 63, 74)"
+    },
+    "stories": [
+      {
+        "heading": "The Photograph",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      },
+      {
+        "heading": "The Painting",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      }
+    ],
+    "storyColumns": "342px",
+    "timelinePresent": false,
+    "timeline": {
+      "present": false,
+      "years": [],
+      "events": [],
+      "links": [],
+      "nodeColors": []
+    },
+    "tabs": false,
+    "infoWidth": 342
+  },
+  "btDesktop": {
+    "vw": 1440,
+    "vh": 900,
+    "paintingHeading": "Brandenburger Tor. 1899",
+    "paintingRows": [
+      {
+        "dt": "Year",
+        "dd": "2017"
+      },
+      {
+        "dt": "Medium",
+        "dd": "Mixed Media On Canvas"
+      },
+      {
+        "dt": "Dimensions",
+        "dd": "80 × 80 cm"
+      },
+      {
+        "dt": "Series",
+        "dd": "A Colorful History"
+      }
+    ],
+    "sourceHeading": "Source photograph",
+    "pending": null,
+    "thumb": true,
+    "caption": "Lucien Lévy",
+    "sourceRows": [
+      {
+        "dt": "Photographer",
+        "dd": "Lucien Lévy"
+      }
+    ],
+    "infoDisplay": "grid",
+    "infoColumns": "400px 400px",
+    "sourceBorderLeft": "0px",
+    "paintingBorderRight": "1px",
+    "paintingBorderRightColor": "color(srgb 0.466667 0.466667 0.466667 / 0.35)",
+    "dt": {
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.62px",
+      "textTransform": "uppercase",
+      "color": "rgb(119, 119, 119)"
+    },
+    "dd": {
+      "fontSize": "15.2px",
+      "fontWeight": "400",
+      "color": "rgb(58, 63, 74)"
+    },
+    "stories": [
+      {
+        "heading": "The Photograph",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      },
+      {
+        "heading": "The Painting",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      }
+    ],
+    "storyColumns": "380px 380px",
+    "timelinePresent": true,
+    "timeline": {
+      "present": true,
+      "years": [
+        "1791",
+        "1806",
+        "1814",
+        "1961",
+        "1989"
+      ],
+      "events": [
+        "Brandenburg Gate completed by Carl Gotthard Langhans",
+        "Napoleon takes the quadriga to Paris after the Battle of Jena-Auerstedt",
+        "Quadriga returned to Berlin; redesigned by Karl Friedrich Schinkel as a Prussian triumphal arch",
+        "Berlin Wall built; gate closed and isolated in the no-man's-land",
+        "Wall falls; gate becomes the symbol of German reunification"
+      ],
+      "links": [
+        "https://en.wikipedia.org/wiki/Brandenburg_Gate",
+        "https://en.wikipedia.org/wiki/Battle_of_Jena%E2%80%93Auerstedt",
+        "https://en.wikipedia.org/wiki/Karl_Friedrich_Schinkel",
+        "https://en.wikipedia.org/wiki/Berlin_Wall",
+        "https://en.wikipedia.org/wiki/Fall_of_the_Berlin_Wall"
+      ],
+      "nodeColors": [
+        "rgb(135, 206, 235)",
+        "rgb(176, 176, 176)",
+        "rgb(200, 121, 65)",
+        "rgb(135, 206, 235)",
+        "rgb(176, 176, 176)"
+      ],
+      "sides": [
+        "historical-date--above",
+        "historical-date--below",
+        "historical-date--above",
+        "historical-date--below",
+        "historical-date--above"
+      ],
+      "dates": [
+        {
+          "year": "1791",
+          "event": "Brandenburg Gate completed by Carl Gotthard Langhans",
+          "link": "https://en.wikipedia.org/wiki/Brandenburg_Gate",
+          "side": "historical-date--above",
+          "nodeColor": "rgb(135, 206, 235)",
+          "contentY": 1446,
+          "nodeY": 1562,
+          "markerX": 320,
+          "contentX": 320,
+          "index": 0
+        },
+        {
+          "year": "1806",
+          "event": "Napoleon takes the quadriga to Paris after the Battle of Jena-Auerstedt",
+          "link": "https://en.wikipedia.org/wiki/Battle_of_Jena%E2%80%93Auerstedt",
+          "side": "historical-date--below",
+          "nodeColor": "rgb(176, 176, 176)",
+          "contentY": 1600,
+          "nodeY": 1583,
+          "markerX": 484,
+          "contentX": 484,
+          "index": 1
+        },
+        {
+          "year": "1814",
+          "event": "Quadriga returned to Berlin; redesigned by Karl Friedrich Schinkel as a Prussian triumphal arch",
+          "link": "https://en.wikipedia.org/wiki/Karl_Friedrich_Schinkel",
+          "side": "historical-date--above",
+          "nodeColor": "rgb(200, 121, 65)",
+          "contentY": 1428,
+          "nodeY": 1562,
+          "markerX": 648,
+          "contentX": 648,
+          "index": 2
+        },
+        {
+          "year": "1961",
+          "event": "Berlin Wall built; gate closed and isolated in the no-man's-land",
+          "link": "https://en.wikipedia.org/wiki/Berlin_Wall",
+          "side": "historical-date--below",
+          "nodeColor": "rgb(135, 206, 235)",
+          "contentY": 1600,
+          "nodeY": 1583,
+          "markerX": 812,
+          "contentX": 812,
+          "index": 3
+        },
+        {
+          "year": "1989",
+          "event": "Wall falls; gate becomes the symbol of German reunification",
+          "link": "https://en.wikipedia.org/wiki/Fall_of_the_Berlin_Wall",
+          "side": "historical-date--above",
+          "nodeColor": "rgb(176, 176, 176)",
+          "contentY": 1446,
+          "nodeY": 1562,
+          "markerX": 976,
+          "contentX": 976,
+          "index": 4
+        }
+      ],
+      "railW": 800,
+      "railH": 2,
+      "railTop": 1577,
+      "railLeft": 320,
+      "display": "grid",
+      "columns": "144px 144px 144px 144px 144px"
+    },
+    "tabs": false,
+    "infoWidth": 800,
+    "timelineShot": true
+  },
+  "btMobile": {
+    "vw": 390,
+    "vh": 844,
+    "paintingHeading": "Brandenburger Tor. 1899",
+    "paintingRows": [
+      {
+        "dt": "Year",
+        "dd": "2017"
+      },
+      {
+        "dt": "Medium",
+        "dd": "Mixed Media On Canvas"
+      },
+      {
+        "dt": "Dimensions",
+        "dd": "80 × 80 cm"
+      },
+      {
+        "dt": "Series",
+        "dd": "A Colorful History"
+      }
+    ],
+    "sourceHeading": "Source photograph",
+    "pending": null,
+    "thumb": true,
+    "caption": "Lucien Lévy",
+    "sourceRows": [
+      {
+        "dt": "Photographer",
+        "dd": "Lucien Lévy"
+      }
+    ],
+    "infoDisplay": "grid",
+    "infoColumns": "342px",
+    "sourceBorderLeft": "0px",
+    "paintingBorderRight": "0px",
+    "paintingBorderRightColor": "rgb(229, 231, 235)",
+    "dt": {
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.62px",
+      "textTransform": "uppercase",
+      "color": "rgb(119, 119, 119)"
+    },
+    "dd": {
+      "fontSize": "15.2px",
+      "fontWeight": "400",
+      "color": "rgb(58, 63, 74)"
+    },
+    "stories": [
+      {
+        "heading": "The Photograph",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      },
+      {
+        "heading": "The Painting",
+        "empty": "Not yet catalogued",
+        "hasBody": false,
+        "headingSize": "18px"
+      }
+    ],
+    "storyColumns": "342px",
+    "timelinePresent": true,
+    "timeline": {
+      "present": true,
+      "years": [
+        "1791",
+        "1806",
+        "1814",
+        "1961",
+        "1989"
+      ],
+      "events": [
+        "Brandenburg Gate completed by Carl Gotthard Langhans",
+        "Napoleon takes the quadriga to Paris after the Battle of Jena-Auerstedt",
+        "Quadriga returned to Berlin; redesigned by Karl Friedrich Schinkel as a Prussian triumphal arch",
+        "Berlin Wall built; gate closed and isolated in the no-man's-land",
+        "Wall falls; gate becomes the symbol of German reunification"
+      ],
+      "links": [
+        "https://en.wikipedia.org/wiki/Brandenburg_Gate",
+        "https://en.wikipedia.org/wiki/Battle_of_Jena%E2%80%93Auerstedt",
+        "https://en.wikipedia.org/wiki/Karl_Friedrich_Schinkel",
+        "https://en.wikipedia.org/wiki/Berlin_Wall",
+        "https://en.wikipedia.org/wiki/Fall_of_the_Berlin_Wall"
+      ],
+      "nodeColors": [
+        "rgb(135, 206, 235)",
+        "rgb(176, 176, 176)",
+        "rgb(200, 121, 65)",
+        "rgb(135, 206, 235)",
+        "rgb(176, 176, 176)"
+      ],
+      "sides": [
+        "historical-date--above",
+        "historical-date--below",
+        "historical-date--above",
+        "historical-date--below",
+        "historical-date--above"
+      ],
+      "dates": [
+        {
+          "year": "1791",
+          "event": "Brandenburg Gate completed by Carl Gotthard Langhans",
+          "link": "https://en.wikipedia.org/wiki/Brandenburg_Gate",
+          "side": "historical-date--above",
+          "nodeColor": "rgb(135, 206, 235)",
+          "contentY": 1727,
+          "nodeY": 1734,
+          "markerX": 24,
+          "contentX": 50,
+          "index": 0
+        },
+        {
+          "year": "1806",
+          "event": "Napoleon takes the quadriga to Paris after the Battle of Jena-Auerstedt",
+          "link": "https://en.wikipedia.org/wiki/Battle_of_Jena%E2%80%93Auerstedt",
+          "side": "historical-date--below",
+          "nodeColor": "rgb(176, 176, 176)",
+          "contentY": 1820,
+          "nodeY": 1827,
+          "markerX": 24,
+          "contentX": 50,
+          "index": 1
+        },
+        {
+          "year": "1814",
+          "event": "Quadriga returned to Berlin; redesigned by Karl Friedrich Schinkel as a Prussian triumphal arch",
+          "link": "https://en.wikipedia.org/wiki/Karl_Friedrich_Schinkel",
+          "side": "historical-date--above",
+          "nodeColor": "rgb(200, 121, 65)",
+          "contentY": 1932,
+          "nodeY": 1938,
+          "markerX": 24,
+          "contentX": 50,
+          "index": 2
+        },
+        {
+          "year": "1961",
+          "event": "Berlin Wall built; gate closed and isolated in the no-man's-land",
+          "link": "https://en.wikipedia.org/wiki/Berlin_Wall",
+          "side": "historical-date--below",
+          "nodeColor": "rgb(135, 206, 235)",
+          "contentY": 2043,
+          "nodeY": 2049,
+          "markerX": 24,
+          "contentX": 50,
+          "index": 3
+        },
+        {
+          "year": "1989",
+          "event": "Wall falls; gate becomes the symbol of German reunification",
+          "link": "https://en.wikipedia.org/wiki/Fall_of_the_Berlin_Wall",
+          "side": "historical-date--above",
+          "nodeColor": "rgb(176, 176, 176)",
+          "contentY": 2136,
+          "nodeY": 2143,
+          "markerX": 24,
+          "contentX": 50,
+          "index": 4
+        }
+      ],
+      "railW": 2,
+      "railH": 489,
+      "railTop": 1731,
+      "railLeft": 31,
+      "display": "block",
+      "columns": "none"
+    },
+    "tabs": false,
+    "infoWidth": 342,
+    "timelineShot": true
+  }
+}

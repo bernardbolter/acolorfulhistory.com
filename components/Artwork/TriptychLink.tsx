@@ -11,13 +11,17 @@ interface TriptychLinkProps {
   currentSlug: string
 }
 
+/**
+ * MoP panel prev/next — cycles I↔II↔III with wrap.
+ * See docs/artwork/addendum-triptych-panel-detail-navigation.md §Decision 2.
+ */
 export default function TriptychLink({
   city,
   triptychSlug,
   panels = [],
   currentSlug,
 }: TriptychLinkProps) {
-  if (!triptychSlug || !city) return null
+  if (!triptychSlug && panels.length === 0) return null
 
   const sorted = [...panels].sort((a, b) => {
     const posA = POSITION_ORDER.indexOf(a.ach?.triptychPosition || 'I')
@@ -26,11 +30,18 @@ export default function TriptychLink({
   })
 
   const currentIndex = sorted.findIndex((panel) => panel.slug === currentSlug)
-  const prev = currentIndex > 0 ? sorted[currentIndex - 1] : undefined
-  const next =
-    currentIndex >= 0 && currentIndex < sorted.length - 1
-      ? sorted[currentIndex + 1]
-      : undefined
+  const canCycle = currentIndex >= 0 && sorted.length > 1
+  const prev = canCycle
+    ? sorted[(currentIndex - 1 + sorted.length) % sorted.length]
+    : undefined
+  const next = canCycle
+    ? sorted[(currentIndex + 1) % sorted.length]
+    : undefined
+
+  const labelCity = city?.trim() || 'Triptych'
+  const commerceHref = city?.trim()
+    ? `/series/mediums-of-perception/${city.trim().toLowerCase()}#commerce`
+    : '/series/mediums-of-perception'
 
   return (
     <nav className="triptych-link-nav" aria-label="Triptych navigation">
@@ -50,11 +61,10 @@ export default function TriptychLink({
           <span />
         )}
       </div>
-      <Link
-        href={`/series/mediums-of-perception/${city.toLowerCase()}#commerce`}
-        className="triptych-commerce-link"
-      >
-        Part of {city} Triptych →
+      <Link href={commerceHref} className="triptych-commerce-link">
+        {city?.trim()
+          ? `Available as part of the ${labelCity} Triptych →`
+          : 'Available as part of the Triptych →'}
       </Link>
     </nav>
   )

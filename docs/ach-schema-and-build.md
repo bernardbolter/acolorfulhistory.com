@@ -194,6 +194,7 @@ Fields that connect the depicted location to the knowledge graph and provide his
 | `keyHistoricalDates` | Array of `{ year: number, event: localized text, wikipediaUrl: localized URI (nullable) }` | artist | INTENT | 3–5 dates Bernard considers anchoring for this location's history. Editorial selection. Each date links to the most specific relevant Wikipedia article — not always the main location article. Agent looks up per-date Wikipedia URLs; Bernard confirms. Dates drawn out in dialogue. |
 | `olderStory` | Rich text, localized | artist | INTENT | The older layer — source photograph context, place history, technology history, photographer story, loss of historical record. Left story column on the ACH artwork page. Bernard's choice per painting — whichever historical angle is most interesting. Always came before the right. Agent does not draft. Drawn out in dialogue. |
 | `newerStory` | Rich text, localized | artist | INTENT | The newer layer — Bernard painting it, when, why, process, what was happening. Right story column on the ACH artwork page. Always the response to the older layer. Agent does not draft. Drawn out in dialogue. |
+| `shareDescription` | Plain text (textarea), localized | artist | INTENT | Share-card copy for `og:description` and the MiniNav Share icon. Written specifically for the share preview — not derived from `newerStory`. Agent does not draft. Drawn out in Art/Official cataloguing. Empty → Share icon hidden and `og:description` omitted. |
 | `fieldRecordingUrl` | Upload → R2 | artist | SYSTEM | Ambient audio for the location. Nullable. UI deferred post-June. |
 | `fieldRecordingCredit` | Text | artist | CORE | Attribution if not Bernard's own recording. Nullable. |
 
@@ -204,7 +205,7 @@ Fields that connect the depicted location to the knowledge graph and provide his
 
 **Art/Official — Group 4 population notes:**
 
-Agent looks up `locationWikidataUri` from the painting's specific subject (Brandenburg Gate, not Berlin). Agent looks up `locationTGNUri` from the Getty LOD endpoint. Both confirmed by Bernard. For `keyHistoricalDates`, agent looks up the most specific Wikipedia article per date and proposes the URL — the 1961 Wall date links to the Berlin Wall article, not the Brandenburg Gate article. Dates themselves are never proposed by agent — drawn out in dialogue: *"What are the 3–5 dates that matter most to understanding this place in relation to the painting?"* `olderStory` and `newerStory` are never drafted by agent — drawn out in dialogue: *"Tell me about the photograph or history behind this one"* and *"Tell me about painting this one."*
+Agent looks up `locationWikidataUri` from the painting's specific subject (Brandenburg Gate, not Berlin). Agent looks up `locationTGNUri` from the Getty LOD endpoint. Both confirmed by Bernard. For `keyHistoricalDates`, agent looks up the most specific Wikipedia article per date and proposes the URL — the 1961 Wall date links to the Berlin Wall article, not the Brandenburg Gate article. Dates themselves are never proposed by agent — drawn out in dialogue: *"What are the 3–5 dates that matter most to understanding this place in relation to the painting?"* `olderStory`, `newerStory`, and `shareDescription` are never drafted by agent — drawn out in dialogue: *"Tell me about the photograph or history behind this one"*, *"Tell me about painting this one."*, and *"How should this painting read on a share card?"*
 
 ---
 
@@ -733,6 +734,8 @@ Group 4 — Location & Historical Context
 □ Bernard provides olderStory
 □ Dialogue: "Tell me about painting this one — when, why, what was happening"
 □ Bernard provides newerStory
+□ Dialogue: "How should this painting read on a share card?"
+□ Bernard provides shareDescription (plain text). Leave empty until written — Share icon stays hidden.
 
 Group 1 — Map & Tour
 □ Agent geocodes city/country → proposes lat/lng

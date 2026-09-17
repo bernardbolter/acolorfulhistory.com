@@ -1,0 +1,29 @@
+{
+  "vw": 1440,
+  "vh": 900,
+  "wrap": {
+    "w": 608,
+    "h": 810,
+    "left": 416,
+    "top": 96,
+    "maxWidth": "936px",
+    "aspect": "3 / 4",
+    "pctOfViewport": 42
+  },
+  "fieldPad": "96px 48px",
+  "faultTopDoc": 1002,
+  "faultTopViewport": 1002,
+  "lowerThirdY": 600,
+  "titleZ": "2",
+  "titleClass": "title-block title-block-back",
+  "miniInsideWrap": true,
+  "miniAfterImage": false,
+  "denseChildOrder": [
+    "flex flex-wrap items-center gap-3 mb-6",
+    "info-tab"
+  ],
+  "badgeIndex": 0,
+  "imageZ": "auto",
+  "hasTriptychNav": false,
+  "triptychText": null
+}

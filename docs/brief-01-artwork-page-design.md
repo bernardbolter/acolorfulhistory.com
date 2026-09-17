@@ -41,12 +41,12 @@ A Colorful History is the series site for Bernard Bolter's Mediums of Perception
 
 ### 1. Initial view — what is visible without scrolling
 
-The zoom requirement means the image doesn't need to fill the viewport entirely — the user can zoom in. So the question is: what is the right initial composition on load?
+**Decided (Brief 15, Aug 27 2026):** third option. Hero is full-bleed width, height-capped to `100dvh` minus the persistent header (brief-14: 61.2px), image `object-fit: cover` / `object-position: center`. MiniNav sits immediately below, just past the fold. See [claude_addendum-hero-centering-mininav-styling.md](./artwork/claude_addendum-hero-centering-mininav-styling.md).
 
-Options on the table:
+The zoom requirement means the image doesn't need to fill the viewport entirely — the user can zoom in. Closed options:
 - Image at a comfortable size (say 70% viewport width on desktop) with title and key metadata already visible alongside or below
 - Image large but not full-bleed, fault line and start of metadata block visible at bottom of viewport
-- Something else
+- Something else → **this:** viewport-capped hero, vertically centered crop, MiniNav as the scroll cue
 
 The two reference paintings for all layout decisions: **Brandenburger Tor 1899** (classical, perfected form) and **Kotbusser Tor 2018** (fault line pushed to extreme asymmetry).
 

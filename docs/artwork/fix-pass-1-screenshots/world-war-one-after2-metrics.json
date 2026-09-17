@@ -1,0 +1,30 @@
+{
+  "vw": 1440,
+  "vh": 900,
+  "wrap": {
+    "w": 1440,
+    "h": 1440,
+    "left": 0,
+    "top": 0,
+    "maxWidth": "none",
+    "aspect": "1 / 1",
+    "pctOfViewport": 100
+  },
+  "fieldPad": "0px",
+  "faultTopDoc": 1500,
+  "faultTopViewport": 1500,
+  "lowerThirdY": 600,
+  "titleZ": "6",
+  "titleClass": "title-block title-block-front",
+  "miniInsideWrap": false,
+  "miniAfterImage": 2,
+  "denseChildOrder": [
+    "info-tab",
+    "triptych-link-nav",
+    "artwork-status-row"
+  ],
+  "badgeIndex": 2,
+  "imageZ": "auto",
+  "hasTriptychNav": true,
+  "triptychText": "← Panel III Panel II → Available as part of the Triptych →"
+}

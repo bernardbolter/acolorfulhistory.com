@@ -1,32 +1,10 @@
 import { Link } from '@/i18n/routing'
 import { getTranslations } from 'next-intl/server'
-import TitleOrnament from '@/components/UI/TitleOrnament'
+import HeroSectionLoader from '@/components/hero/HeroSectionLoader'
 import type { HomePageSection } from '@/types/homePage'
 
 function sectionData(section: HomePageSection): Record<string, unknown> {
   return section.data ?? {}
-}
-
-async function HeroSection({ section }: { section: HomePageSection }) {
-  const t = await getTranslations()
-  const data = sectionData(section)
-  const title = (data.title as string) || t('aColorfulHistory')
-  const subtitle =
-    (data.subtitle as string) || t('paintingPhotographyAndHistory')
-  const href = (data.href as string) || '/series'
-
-  return (
-    <section className="home-section home-hero zone-field pt-28">
-      <TitleOrnament className="mb-4" />
-      <h2 className="font-display text-artwork-title text-text-primary">{title}</h2>
-      <p className="mt-4 max-w-xl text-body text-text-muted">{subtitle}</p>
-      {data.ctaLabel ? (
-        <Link href={href} className="home-cta mt-8 inline-block">
-          → {String(data.ctaLabel)}
-        </Link>
-      ) : null}
-    </section>
-  )
 }
 
 async function SeriesFeatureSection({ section }: { section: HomePageSection }) {
@@ -55,7 +33,7 @@ async function SeriesLinkSection() {
 
   return (
     <section className="home-section zone-field">
-      <Link href="/series" className="home-cta inline-block">
+      <Link href="/" className="home-cta inline-block">
         → {t('exploreCollection')}
       </Link>
     </section>
@@ -101,7 +79,7 @@ export default async function HomeSectionRenderer({
 }) {
   switch (section.type) {
     case 'hero':
-      return <HeroSection section={section} />
+      return <HeroSectionLoader />
     case 'series-feature':
       return <SeriesFeatureSection section={section} />
     case 'series-link':

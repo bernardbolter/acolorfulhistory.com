@@ -1,7 +1,7 @@
 // app/layout.tsx
 import './globals.css'
 import type { Metadata } from 'next'
-import { barlow, limelight, bodyFontClassName } from '@/lib/fonts'
+import { barlow, limelight, josefin, bodyFontClassName } from '@/lib/fonts'
 
 export const metadata: Metadata = {
   title: 'A Colorful History',
@@ -17,7 +17,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${barlow.variable} ${limelight.variable}`}
+      className={`${barlow.variable} ${limelight.variable} ${josefin.variable}`}
     >
       <body className={`${bodyFontClassName} antialiased`}>{children}</body>
     </html>

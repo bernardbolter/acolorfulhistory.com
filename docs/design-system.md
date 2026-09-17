@@ -343,7 +343,7 @@ Limelight has one weight only. Never bold, never italic. Letter-spacing: `0.03em
 | Line heights that relate to text | SVG stroke widths |
 | Padding/margin around text content | Fixed structural dimensions (nav strip height, panel width, pin size) |
 | Spacing that should grow if browser font size increases | Layout offsets (top: 20px, right: 20px) |
-| | Thumbnail geometry (100px height, proportion × 100px width) |
+| | Thumbnail geometry (100px height, aspectRatio × 100px width) |
 | | Gap between thumbnails (5px) |
 
 **Quick reference — common values:**
@@ -411,7 +411,7 @@ screens: {
 | Nav button position | `top: 10px, right: 20px` |
 | Nav button dimensions | `30px × 30px` |
 | Map popup image height | `100px` (fixed) |
-| Map popup image width | `100 * artwork.proportion` (px) |
+| Map popup image width | `100 * artwork.aspectRatio` (px) |
 | Filter tab bottom offset | `0` (map) or `110px` (above nav strip) |
 
 ### Spacing Scale
@@ -445,7 +445,7 @@ No formal spacing scale in source — values are ad-hoc. Recommended Tailwind ma
 
 ### Desktop (>= 769px)
 - Nav menu: `300px` right panel, `height: 470px`, slides from right edge
-- Logo: shifts right to `calc(100% - 270px)` when nav is open (transition)
+- Logo: shifts right to `calc(100% - 318px)` when nav is open (transition). Tied to current `ColorLogo` (298px + left chrome); revisit if the SVG is resized. (Was 270px — superseded Aug 25 2026, [decision-four-open-calls-pass-2.md](./artwork/decision-four-open-calls-pass-2.md) §2.)
 - Nav button: moves right with logo shift
 - Artwork detail: two-column grid `1fr 1fr`, `gap: 4rem`
 
@@ -458,24 +458,24 @@ No formal spacing scale in source — values are ad-hoc. Recommended Tailwind ma
 
 ## 6. Artwork Sizing
 
-**The proportion system is the most important data pattern in the site.**
+**The aspect-ratio system is the most important data pattern in the site.**
 
-Every artwork has a `proportion` field (width ÷ height float). This drives all thumbnail and popup sizing:
+Every artwork has an `aspectRatio` field (width ÷ height float — Payload computed `widthMm ÷ heightMm`). This drives all thumbnail and popup sizing:
 
 ```
-thumbnail width = 100 * artwork.proportion (px)
+thumbnail width = 100 * artwork.aspectRatio (px)
 thumbnail height = 100px (fixed)
 ```
 
-This means square works are 100×100, landscape works are wider, portrait works are narrower. The map nav strip is a horizontal scroll of proportionally-sized thumbnails.
+This means square works are 100×100, landscape works are wider, portrait works are narrower. The map nav strip is a horizontal scroll of proportionally-sized thumbnails. Treat `aspectRatio: null` as `1` (square).
 
-**Map popup:** same system — images at `100px` height × `100 * proportion` width.
+**Map popup:** same system — images at `100px` height × `100 * aspectRatio` width.
 
 **Detail page:** artwork fills as much of `65vw` as possible on desktop, constrained to `90vh`. Portrait works fill by height; landscape works fill by width.
 
-**Animation overlay:** scales from popup rect to 75% viewport height, proportion-aware. Width = `75vh * proportion`, unless that exceeds `90vw` in which case width-constrained.
+**Animation overlay:** scales from popup rect to 75% viewport height, ratio-aware. Width = `75vh * aspectRatio`, unless that exceeds `90vw` in which case width-constrained.
 
-**Rule:** Never display artwork at a fixed square crop. Always respect proportion.
+**Rule:** Never display artwork at a fixed square crop. Always respect `artwork.aspectRatio`. The WordPress-era field `artwork.artworkFields.proportion` does not exist in the live Payload schema — do not use it.
 
 ---
 
@@ -503,7 +503,7 @@ SVG pins colored from the painting palette accent colors — random but consiste
 Full-viewport overlay (`z-index: 10000`). Image animates from popup rect → center of viewport (75% height). Background fades to `rgba(255,255,255,0.85)`. Uses `cubic-bezier(0.4, 0, 0.2, 1)` for the position/size transition. Reverse animation plays in reverse. `pointer-events: none` throughout.
 
 ### The Logo
-`ColorLogo` is a fixed SVG (298×25px) with letters colored in the new painting palette warm-to-cool sequence (see Section 2 — Logo Palette). "HISTORY" is charcoal `#3A3F4A` at 75% opacity. It is never replaced with text. Below it: tagline at `0.75rem/400`, byline `by Bernard Bolter` at `0.5625rem/500/#000000`. The logo has a `logo-menu-open` state that on desktop shifts to `left: calc(100% - 270px)`.
+`ColorLogo` is a fixed SVG (298×25px) with letters colored in the new painting palette warm-to-cool sequence (see Section 2 — Logo Palette). "HISTORY" is charcoal `#3A3F4A` at 75% opacity. It is never replaced with text. Below it: tagline at `0.75rem/400`, byline `by Bernard Bolter` at `0.5625rem/500/#000000`. Logo + tagline + byline shift together as one group. The logo has a `logo-menu-open` state that on desktop shifts to `left: calc(100% - 318px)` (tied to the 298px SVG + chrome; was written as 270px).
 
 ---
 
@@ -770,7 +770,7 @@ All icons are custom SVG components in `src/svg/`. None use an icon library.
 
 - **Map nav height:** currently `110px`. May need to increase for larger devices or taller artwork thumbnails. Check against actual artwork proportions.
 - **Nav panel height (desktop):** `470px` hardcoded. Will need adjustment if nav content grows (new series links).
-- **Logo shift on menu open:** `left: calc(100% - 270px)` — magic number derived from nav panel width. Update if nav panel width changes.
+- **Logo shift on menu open:** `left: calc(100% - 318px)` — tied to current `ColorLogo` width (298px + ~20px left chrome), not panel width. Revisit if the SVG is resized.
 - **Filter tab bottom offset:** `110px` when map nav is visible, `0` when not. Currently controlled via inline style from `history.viewMap`. Confirm this is the right approach or convert to a CSS class toggle.
 - **Artwork animation timing:** `600ms` scale + `400ms` total = `1000ms`. May feel slow on fast connections where the new page loads instantly. Consider reducing to `400ms` + `200ms` = `600ms`.
 - **Spectrum duplicate:** `$aquaColbolt` and `$colbalt` are both `#3482AD`. Intentional? Check logo SVGs — they may need distinct values.
@@ -781,7 +781,7 @@ All icons are custom SVG components in `src/svg/`. None use an icon library.
 
 - **Do not use `font-size: Npx` anywhere in the new codebase.** All font sizes are rem. `font-size: 14px` is a bug — use `0.875rem`.
 - **Do not use rem for fixed structural geometry.** `width: 6.875rem` for the map nav strip is wrong — use `110px`. The rule: text scales, structure doesn't. This site has one breakpoint: `l:` (`>= 769px`). Using standard Tailwind breakpoints will create unintended intermediate states.
-- **Do not display artwork at fixed square crops.** Every image must respect `artwork.artworkFields.proportion`.
+- **Do not display artwork at fixed square crops.** Every image must respect `artwork.aspectRatio` (Payload). Do not read `artwork.artworkFields.proportion` — that field is retired WordPress-era shape and is not in the live schema.
 - **Do not replace the ColorLogo SVG with a text element.** The spectrum-colored SVG logo is part of the identity.
 - **Do not add a second typeface.** Barlow Semi Condensed at varying weights is the entire type system.
 - **Do not use rounded corners on the filter checkbox.** It is a hard-edged `12×12px` square.
@@ -833,7 +833,8 @@ src/
 ├── helpers/
 │   ├── helpers.ts          — interpolate(), decideColor()
 │   └── animation.ts        — animation state helpers
-├── lib/graphql.ts          — all GQL queries + TS interfaces
+├── lib/data.ts             — Payload CMS fetches (sole data source)
+├── lib/payload.ts          — archive API client
 ├── middleware.ts           — next-intl createMiddleware, handles /en/ /de/ routing
 ├── providers/
 │   └── HistoryProvider.tsx — global state (artwork list, map, animation)
@@ -995,85 +996,56 @@ The Kotbusser Tor rectangle (`#2A1545` — deep purple, reads near-black straigh
 No blur placeholders. No grey boxes. Artwork spaces fill with a flat painting palette color before the image loads — like the painted fields themselves appearing before the photograph arrives.
 
 **How it works in Next.js:**
-Each `<Image>` component receives a `placeholder="blur"` prop with a custom `blurDataURL` — a base64-encoded 1×1 pixel PNG in a painting palette color. The color is deterministic per artwork, derived from the artwork's city.
+Each `<Image>` component receives a `placeholder="blur"` prop with a custom `blurDataURL` — a base64-encoded 1×1 pixel PNG in a painting palette color. Prefer a hex from the artwork's own `overlayColors[]` (ACH overlay group). The city-to-color `CITY_PLACEHOLDER` map is **retired** (brief-12) — do not introduce it, or `artworkFields.artworkImage.mediaDetails`, in new work.
 
-**Color assignment per city:**
-| City | Placeholder color | Token |
-|---|---|---|
-| Berlin | `#A8D6E8` | `$paint-sky-warm` |
-| San Francisco | `#B8B8BC` | `$paint-mid-grey` |
-| Munich | `#F0E8C0` | `$paint-cream` |
-| Amsterdam | `#C4907A` | `$paint-dusty-salmon` |
-| New York | `#B8B8BC` | `$paint-mid-grey` |
-| Unknown / fallback | `#F4F2EE` | `$paint-warm-white` |
+**Palette hexes (still valid as color tokens; not as a city lookup):**
+| Hex | Token |
+|---|---|
+| `#A8D6E8` | `$paint-sky-warm` |
+| `#B8B8BC` | `$paint-mid-grey` |
+| `#F0E8C0` | `$paint-cream` |
+| `#C4907A` | `$paint-dusty-salmon` |
+| `#F4F2EE` | `$paint-warm-white` (fallback when `overlayColors` is empty) |
 
-**Base64 1×1 PNG generator:**
 ```ts
-// lib/placeholders.ts
-export function colorToBlurDataURL(hex: string): string {
-  // Convert hex to RGB
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  
-  // 1x1 PNG in base64 — hardcoded minimal PNG structure
-  // Use a lookup table of pre-generated values for each palette color
-  return PLACEHOLDER_MAP[hex] ?? PLACEHOLDER_MAP['#F4F2EE']
-}
-
-// Pre-generated base64 1×1 PNGs for each palette color
-// Generate once with: node -e "const {createCanvas}=require('canvas'); ..."
-export const PLACEHOLDER_MAP: Record<string, string> = {
-  '#A8D6E8': 'data:image/png;base64,...', // sky warm
-  '#B8B8BC': 'data:image/png;base64,...', // mid grey
-  '#F0E8C0': 'data:image/png;base64,...', // cream
-  '#C4907A': 'data:image/png;base64,...', // dusty salmon
-  '#F4F2EE': 'data:image/png;base64,...', // warm white fallback
-}
-
-// City to color map
-export const CITY_PLACEHOLDER: Record<string, string> = {
-  'Berlin':        '#A8D6E8',
-  'San Francisco': '#B8B8BC',
-  'Munich':        '#F0E8C0',
-  'Amsterdam':     '#C4907A',
-  'New York':      '#B8B8BC',
-}
-
-export function getArtworkPlaceholder(city: string): string {
-  const color = CITY_PLACEHOLDER[city] ?? '#F4F2EE'
-  return colorToBlurDataURL(color)
+function getArtworkPlaceholderColor(overlayColors: string[]): string {
+  if (!overlayColors?.length) return '#F4F2EE'
+  return overlayColors[Math.floor(Math.random() * overlayColors.length)]
 }
 ```
 
 **Usage on Image component:**
 ```tsx
 <Image
-  src={artwork.artworkFields.artworkImage.mediaDetails.sizes[1].sourceUrl}
+  src={artwork.primaryImageUrl}
   alt={artwork.title}
-  width={100 * artwork.artworkFields.proportion}
+  width={100 * (artwork.aspectRatio ?? 1)}
   height={100}
   placeholder="blur"
-  blurDataURL={getArtworkPlaceholder(artwork.artworkFields.city)}
+  blurDataURL={artwork.placeholderBlurDataURL}
 />
 ```
 
+Live `primaryImage` at `depth ≥ 1` is a media object with a top-level `url`. The mapper resolves that to `artwork.primaryImageUrl`. There is no `mediaDetails.sizes[1].sourceUrl`.
+
 **Note:** The `blurDataURL` with `placeholder="blur"` in Next.js applies a CSS blur filter over the placeholder — disable this blur effect with `style={{ filter: 'none' }}` on the image, or use a custom loading state instead. The goal is a flat color, not a blurred pixel. An alternative approach is a CSS background color on the image wrapper div that disappears once the image loads via the `onLoad` callback.
 
-**Alternative — wrapper approach (no blur artefact):**
+**Alternative — wrapper approach (no blur artefact, preferred by brief-12):**
 ```tsx
 const [loaded, setLoaded] = useState(false)
-const placeholderColor = getArtworkPlaceholderColor(artwork.artworkFields.city)
+const placeholderColor = getArtworkPlaceholderColor(artwork.ach?.overlayColors ?? [])
 
 <div style={{ background: loaded ? 'transparent' : placeholderColor, transition: 'background 0.3s ease' }}>
   <Image
-    src={...}
+    src={artwork.primaryImageUrl}
+    alt={artwork.title}
+    width={100 * (artwork.aspectRatio ?? 1)}
+    height={100}
     onLoad={() => setLoaded(true)}
-    ...
   />
 </div>
 ```
 
 ---
 
-*This document is the single reference for all agents building ACH / Mediums of Perception components. Update it when reality diverges from spec. The token names are the contract. Last substantially updated: April 2026.*
+*This document is the single reference for all agents building ACH / Mediums of Perception components. Update it when reality diverges from spec. The token names are the contract. Last substantially updated: August 2026 (Payload field names: `primaryImageUrl` / `aspectRatio`; WordPress `artworkFields.proportion` sample retired).*

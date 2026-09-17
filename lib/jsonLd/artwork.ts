@@ -14,8 +14,8 @@ export function generateArtworkJsonLd(
   const ach = artwork.ach
   const fields = artwork.artworkFields
   const imageUrl =
-    fields.artworkImage?.mediaItemUrl ||
-    artwork.featuredImage?.node?.sourceUrl
+    artwork.primaryImageUrl ||
+    fields.artworkImage?.mediaItemUrl
 
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -59,6 +59,15 @@ export function generateArtworkJsonLd(
       name: fields.city,
       sameAs: [ach.locationWikidataUri, ach.locationTGNUri].filter(Boolean),
     }
+  }
+
+  if (ach?.keyHistoricalDates?.length) {
+    jsonLd.mentions = ach.keyHistoricalDates.map((entry) => ({
+      '@type': 'Event',
+      name: entry.event,
+      startDate: String(entry.year),
+      ...(entry.wikipediaUrl ? { sameAs: entry.wikipediaUrl } : {}),
+    }))
   }
 
   return jsonLd

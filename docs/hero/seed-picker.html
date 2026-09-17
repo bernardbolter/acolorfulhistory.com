@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Field Seed Picker — A Colorful History</title>
+<style>
+  :root {
+    --ink: #1A1A1C;
+    --paper: #F4F2EE;
+    --gate: #2A1545;
+    --line: #D8D4CC;
+    --warn: #B8742A;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--paper); color: var(--ink);
+    display: grid; grid-template-columns: 1fr 340px; height: 100vh;
+  }
+  /* ---------- canvas side ---------- */
+  #stage {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: repeating-conic-gradient(#ECEAE4 0 25%, var(--paper) 0 50%) 0 0 / 24px 24px;
+  }
+  #stage.empty::after {
+    content: "Drop the square painting image here, or use Load image";
+    color: #8A867E;
+  }
+  canvas { max-width: 100%; max-height: 100%; cursor: crosshair; display: block; }
+  /* ---------- panel ---------- */
+  #panel {
+    border-left: 2px solid var(--ink); padding: 20px;
+    display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
+    background: var(--paper);
+  }
+  h1 { font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
+  h1 span { color: var(--gate); }
+  label { display: block; font-size: 11px; text-transform: uppercase;
+          letter-spacing: .08em; color: #6B675F; margin-bottom: 4px; }
+  input[type=text], input[type=number] {
+    width: 100%; padding: 6px 8px; border: 1px solid var(--ink);
+    background: #fff; font: inherit;
+  }
+  .row { display: flex; gap: 8px; }
+  button {
+    font: inherit; padding: 8px 12px; border: 1px solid var(--ink);
+    background: #fff; cursor: pointer;
+  }
+  button:hover { background: var(--ink); color: var(--paper); }
+  button.primary { background: var(--gate); color: #fff; border-color: var(--gate); }
+  button.primary:hover { background: var(--ink); border-color: var(--ink); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--gate); outline-offset: 2px; }
+  /* mode toggle */
+  .modes { display: flex; border: 1px solid var(--ink); }
+  .modes button { flex: 1; border: 0; }
+  .modes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  /* field list */
+  #fields { display: flex; flex-direction: column; gap: 8px; }
+  .field {
+    display: grid; grid-template-columns: 24px 1fr 58px 24px;
+    gap: 8px; align-items: center; padding: 6px;
+    border: 1px solid var(--line); background: #fff;
+  }
+  .swatch { width: 24px; height: 24px; border: 1px solid var(--ink); }
+  .field input[type=text] { border-color: var(--line); padding: 4px 6px; }
+  .field input[type=number] { border-color: var(--line); padding: 4px 4px; }
+  .field .del { border: 0; padding: 0; width: 24px; height: 24px; line-height: 1; }
+  #photoState { font-size: 12px; color: #6B675F; }
+  #photoState.set { color: var(--gate); font-weight: 700; }
+  .hint { font-size: 12px; color: #8A867E; }
+  .warn { font-size: 12px; color: var(--warn); }
+  footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body>
+
+<div id="stage" class="empty"><canvas id="canvas" hidden></canvas></div>
+
+<aside id="panel">
+  <h1>Seed Picker <span>· hero fields</span></h1>
+
+  <div>
+    <label for="slug">Artwork slug</label>
+    <input type="text" id="slug" placeholder="berlin-brandenburgertor-1899">
+  </div>
+
+  <div class="row">
+    <button id="loadBtn">Load image</button>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+  </div>
+
+  <div>
+    <label>Click mode</label>
+    <div class="modes">
+      <button id="modeField" aria-pressed="true">Field seed</button>
+      <button id="modePhoto" aria-pressed="false">Photo corners</button>
+    </div>
+    <p class="hint" id="modeHint">Click inside a painted field to record a seed.</p>
+  </div>
+
+  <div>
+    <label>Photo rectangle</label>
+    <p id="photoState">Not set — switch to Photo corners, click two opposite corners.</p>
+  </div>
+
+  <div>
+    <label>Fields (name · tolerance)</label>
+    <div id="fields"></div>
+    <p class="hint" id="emptyFields">No seeds yet.</p>
+  </div>
+
+  <footer>
+    <p class="warn" id="warnMsg" hidden></p>
+    <button class="primary" id="exportBtn">Download config.json</button>
+    <p class="hint">Feed the config to extract_hero_fields.py together with the same image.</p>
+  </footer>
+</aside>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const fileInput = document.getElementById('fileInput');
+
+  let img = null;            // HTMLImageElement at natural size
+  let natW = 0, natH = 0;
+  let mode = 'field';        // 'field' | 'photo'
+  let fields = [];           // {name, hex, seed:[x,y], tolerance}
+  let photoClicks = [];      // up to 2 natural-coord points
+  let photoRect = null;      // normalized {x,y,w,h}
+
+  // ---------- image loading ----------
+  document.getElementById('loadBtn').onclick = () => fileInput.click();
+  fileInput.onchange = e => e.target.files[0] && loadFile(e.target.files[0]);
+  stage.addEventListener('dragover', e => e.preventDefault());
+  stage.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) loadFile(f);
+  });
+
+  function loadFile(file) {
+    const url = URL.createObjectURL(file);
+    const im = new Image();
+    im.onload = () => {
+      img = im; natW = im.naturalWidth; natH = im.naturalHeight;
+      canvas.width = natW; canvas.height = natH;
+      canvas.hidden = false; stage.classList.remove('empty');
+      fields = []; photoClicks = []; photoRect = null;
+      const guess = file.name.replace(/\.[^.]+$/, '').replace(/_/g, '-');
+      if (!slugInput.value) slugInput.value = guess;
+      renderAll();
+    };
+    im.src = url;
+  }
+
+  // ---------- modes ----------
+  const modeFieldBtn = document.getElementById('modeField');
+  const modePhotoBtn = document.getElementById('modePhoto');
+  const modeHint = document.getElementById('modeHint');
+  function setMode(m) {
+    mode = m;
+    modeFieldBtn.setAttribute('aria-pressed', m === 'field');
+    modePhotoBtn.setAttribute('aria-pressed', m === 'photo');
+    modeHint.textContent = m === 'field'
+      ? 'Click inside a painted field to record a seed.'
+      : 'Click two opposite corners of the photograph area.';
+  }
+  modeFieldBtn.onclick = () => setMode('field');
+  modePhotoBtn.onclick = () => setMode('photo');
+
+  // ---------- clicking ----------
+  canvas.addEventListener('click', e => {
+    if (!img) return;
+    const r = canvas.getBoundingClientRect();
+    const x = Math.round((e.clientX - r.left) / r.width * natW);
+    const y = Math.round((e.clientY - r.top) / r.height * natH);
+
+    if (mode === 'field') {
+      const hex = samplePixel(x, y);
+      fields.push({ name: 'field-' + (fields.length + 1), hex, seed: [x, y], tolerance: 12 });
+    } else {
+      photoClicks.push([x, y]);
+      if (photoClicks.length === 2) {
+        const [[x1, y1], [x2, y2]] = photoClicks;
+        photoRect = {
+          x: +(Math.min(x1, x2) / natW).toFixed(4),
+          y: +(Math.min(y1, y2) / natH).toFixed(4),
+          w: +(Math.abs(x2 - x1) / natW).toFixed(4),
+          h: +(Math.abs(y2 - y1) / natH).toFixed(4)
+        };
+        photoClicks = [];
+        setMode('field');
+      }
+    }
+    renderAll();
+  });
+
+  function samplePixel(x, y) {
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(x, y, 1, 1).data;
+    return '#' + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+
+  // ---------- render ----------
+  function renderAll() { drawCanvas(); renderPanel(); }
+
+  function drawCanvas() {
+    if (!img) return;
+    ctx.drawImage(img, 0, 0);
+    const s = Math.max(6, Math.round(natW * 0.006));
+    // photo rect
+    if (photoRect) {
+      ctx.strokeStyle = '#2A1545'; ctx.lineWidth = s / 2; ctx.setLineDash([s * 2, s]);
+      ctx.strokeRect(photoRect.x * natW, photoRect.y * natH, photoRect.w * natW, photoRect.h * natH);
+      ctx.setLineDash([]);
+    }
+    // pending photo click
+    photoClicks.forEach(p => marker(p[0], p[1], '#2A1545', s));
+    // seeds
+    fields.forEach((f, i) => {
+      marker(f.seed[0], f.seed[1], '#1A1A1C', s);
+      ctx.font = `bold ${s * 3}px monospace`;
+      ctx.fillStyle = '#1A1A1C';
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = s / 1.5;
+      const label = String(i + 1);
+      ctx.strokeText(label, f.seed[0] + s * 1.5, f.seed[1] - s * 1.5);
+      ctx.fillText(label, f.seed[0] + s * 1.5, f.seed[1] - s * 1.5);
+    });
+  }
+
+  function marker(x, y, color, s) {
+    ctx.beginPath(); ctx.arc(x, y, s, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.lineWidth = s / 2; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
+  }
+
+  const fieldsBox = document.getElementById('fields');
+  const emptyFields = document.getElementById('emptyFields');
+  const photoState = document.getElementById('photoState');
+  const slugInput = document.getElementById('slug');
+
+  function renderPanel() {
+    emptyFields.hidden = fields.length > 0;
+    fieldsBox.innerHTML = '';
+    fields.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = 'field';
+      row.innerHTML = `
+        <div class="swatch" style="background:${f.hex}" title="${f.hex}"></div>
+        <input type="text" value="${f.name}" aria-label="Field name">
+        <input type="number" value="${f.tolerance}" min="1" max="60" aria-label="Tolerance">
+        <button class="del" aria-label="Delete field">×</button>`;
+      const [ , nameEl, tolEl, delEl] = row.children;
+      nameEl.oninput = e => { f.name = e.target.value; };
+      tolEl.oninput = e => { f.tolerance = parseInt(e.target.value, 10) || 12; };
+      delEl.onclick = () => { fields.splice(i, 1); renderAll(); };
+      fieldsBox.appendChild(row);
+    });
+    if (photoRect) {
+      photoState.textContent =
+        `Set: x ${photoRect.x}, y ${photoRect.y}, w ${photoRect.w}, h ${photoRect.h}`;
+      photoState.className = 'set';
+    }
+  }
+
+  // ---------- export ----------
+  document.getElementById('exportBtn').onclick = () => {
+    const warn = document.getElementById('warnMsg');
+    warn.hidden = true;
+    if (!img) { warn.textContent = 'Load an image first.'; warn.hidden = false; return; }
+    if (fields.length === 0) { warn.textContent = 'No field seeds recorded.'; warn.hidden = false; return; }
+    const config = {
+      artwork: slugInput.value || 'untitled',
+      imageSize: [natW, natH],
+      photoRect: photoRect,
+      fields: fields.map(f => ({
+        name: f.name, hex: f.hex, seed: f.seed, tolerance: f.tolerance
+      }))
+    };
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (slugInput.value || 'config') + '.seeds.json';
+    a.click();
+  };
+})();
+</script>
+</body>
+</html>

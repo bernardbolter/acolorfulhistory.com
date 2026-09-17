@@ -82,7 +82,7 @@ const defaultHistoryState: HistoryState = {
   navOpen: false,
   currentCity: '',
   searchTerm: '',
-  viewMap: true,
+  viewMap: false,
   viewContact: false,
   viewGates: false,
   viewWar: false,

@@ -17,14 +17,8 @@ export interface ArtworkImage {
     mediaItemUrl?: string;
 }
 
-export interface ArtworkLink {
-    url: string;
-    title: string;
-}
-
 export interface ArtworkFields {
     city: string;
-    artworklink?: ArtworkLink;
     artworkImage?: ArtworkImage;
     country: string;
     forsale: boolean;
@@ -32,8 +26,6 @@ export interface ArtworkFields {
     lat: number;
     lng: number;
     medium: string;
-    metadescription?: string;
-    metakeywords?: string;
     orientation: string;
     proportion: number;
     series?: string;
@@ -43,61 +35,38 @@ export interface ArtworkFields {
     year: number;
 }
 
-export interface ARMediaNode {
-  node?: {
-    uri?: string
-  }
-}
-
-export interface ARExperience {
-  color?: string
-  icon?: ARMediaNode
-  poster?: ARMediaNode
-  video?: ARMediaNode
-}
-
-export interface ColorfulFields {
-  ar?: boolean
-  mind?: ARMediaNode
-  freestyle?: ARExperience
-  making?: ARExperience
-  history?: ARExperience
-  storyDe?: string
-  storyEn?: string
-  wikiLinkDe?: string
-  wikiLinkEn?: string
-}
-
-export interface FeaturedImage {
-    node: {
-        sourceUrl: string;
-        altText: string;
-    };
-}
-
 export interface Artwork {
     slug: string;
     artworkFields: ArtworkFields;
-    /** ACH tab fields from Payload — populated when using Payload API. */
+    /** ACH tab fields from Payload. */
     ach?: AchFields;
-    colorfulFields?: ColorfulFields;
     title: string;
     content?: string;
-    databaseId: number;
     id: string;
     date: string;
-    featuredImage?: FeaturedImage;
     seriesSlug?: string;
+    /** Populated series name from Payload relation when depth ≥ 2. */
+    seriesName?: string;
+    /** @deprecated Use seriesName — kept for callers not yet migrated. */
+    seriesTitle?: string;
+    /** Archive commerce status from Payload Commerce tab. */
+    availabilityStatus?: string;
+    /** Payload aspectRatio (width ÷ height). Falls back to 1 when null. */
+    aspectRatio?: number;
+  /** Physical painting size tier from Payload (`md` | `lg` | `xl`). */
+  sizeTier?: 'md' | 'lg' | 'xl';
+  /** Physical width in cm (`widthWhole`). */
+  widthCm?: number;
+  /** Physical height in cm (`heightWhole`). */
+  heightCm?: number;
+  /** Resolved primaryImage URL at depth ≥ 2. */
+  primaryImageUrl?: string
+  /** Payload `sizes.thumbnail` (300px square) when present. */
+  primaryImageThumbnailUrl?: string;
+  /** 1×1 PNG blurDataURL for Next.js Image placeholder (computed server-side). */
+  placeholderBlurDataURL?: string;
+  yearCreated?: number;
+    createdAt?: string;
     triptychSlug?: string;
     index?: number;
-}
-
-export interface ArtworkResponse {
-    allArtwork: {
-        nodes: Artwork[];
-    };
-}
-
-export interface SingleArtworkResponse {
-    artwork: Artwork;
 }

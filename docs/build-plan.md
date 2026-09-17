@@ -50,7 +50,7 @@ Use this as the single checklist for implementation. Update task checkboxes as w
 | Logo | ✓ SVG component | `components/UI/Logo.tsx` |
 | Artwork detail route | ✓ Placeholder only | `app/[locale]/[slug]/page.tsx` |
 | AR route | ✓ Placeholder only | `app/[locale]/[slug]/ar/page.tsx` |
-| Data fetch | ✓ WordPress GraphQL | `lib/data.ts`, `lib/graphql.ts` |
+| Data fetch | ✓ Payload CMS | `lib/data.ts`, `lib/payload.ts` |
 
 ### Scaffold exists but is not wired or is broken
 

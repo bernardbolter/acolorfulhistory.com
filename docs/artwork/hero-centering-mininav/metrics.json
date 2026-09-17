@@ -1,0 +1,210 @@
+{
+  "desktopWwi": {
+    "viewport": {
+      "w": 1440,
+      "h": 900
+    },
+    "headerOffset": "61.2px",
+    "zonePaddingTop": "61.2px",
+    "hero": {
+      "top": 61.2,
+      "bottom": 900,
+      "width": 1440,
+      "height": 838.8
+    },
+    "wrap": {
+      "top": 61.2,
+      "width": 1440,
+      "height": 838.8
+    },
+    "img": {
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "naturalW": 600,
+      "naturalH": 599
+    },
+    "mini": {
+      "top": 900,
+      "bottom": 967.9,
+      "left": 0,
+      "right": 1440,
+      "width": 1440,
+      "height": 67.9,
+      "justify": "flex-end",
+      "pastFold": true,
+      "inViewport": true
+    },
+    "buttons": [
+      {
+        "label": "Zoom",
+        "aria": "Zoom"
+      }
+    ]
+  },
+  "desktopWwiiForced": {
+    "viewport": {
+      "w": 1440,
+      "h": 900
+    },
+    "headerOffset": "61.2px",
+    "zonePaddingTop": "61.2px",
+    "hero": {
+      "top": 61.2,
+      "bottom": 900,
+      "width": 1440,
+      "height": 838.8
+    },
+    "wrap": {
+      "top": 61.2,
+      "width": 1440,
+      "height": 838.8
+    },
+    "img": {
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "naturalW": 600,
+      "naturalH": 599
+    },
+    "mini": {
+      "top": 900,
+      "bottom": 967.9,
+      "left": 0,
+      "right": 1440,
+      "width": 1440,
+      "height": 67.9,
+      "justify": "flex-end",
+      "pastFold": true,
+      "inViewport": true
+    },
+    "buttons": [
+      {
+        "label": "Zoom",
+        "aria": "Zoom"
+      },
+      {
+        "label": "Reveal source",
+        "aria": "Reveal source"
+      },
+      {
+        "label": "AR",
+        "aria": "Augmented reality"
+      },
+      {
+        "label": "Share",
+        "aria": "Share"
+      }
+    ]
+  },
+  "desktopWwiiHover": {
+    "btnColor": "rgb(143, 204, 234)",
+    "labelColor": "rgb(143, 204, 234)",
+    "accent": "#8FCCEA"
+  },
+  "mobileWwi": {
+    "viewport": {
+      "w": 390,
+      "h": 844
+    },
+    "headerOffset": "61.2px",
+    "zonePaddingTop": "61.2px",
+    "hero": {
+      "top": 61.2,
+      "bottom": 844,
+      "width": 390,
+      "height": 782.8
+    },
+    "wrap": {
+      "top": 61.2,
+      "width": 390,
+      "height": 782.8
+    },
+    "img": {
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "naturalW": 390,
+      "naturalH": 389
+    },
+    "mini": {
+      "top": 844,
+      "bottom": 911.9,
+      "left": 0,
+      "right": 390,
+      "width": 390,
+      "height": 67.9,
+      "justify": "flex-end",
+      "pastFold": true,
+      "inViewport": true
+    },
+    "buttons": [
+      {
+        "label": "Zoom",
+        "aria": "Zoom"
+      }
+    ]
+  },
+  "mobileWwiForced": {
+    "viewport": {
+      "w": 390,
+      "h": 844
+    },
+    "headerOffset": "61.2px",
+    "zonePaddingTop": "61.2px",
+    "hero": {
+      "top": 61.2,
+      "bottom": 844,
+      "width": 390,
+      "height": 782.8
+    },
+    "wrap": {
+      "top": 61.2,
+      "width": 390,
+      "height": 782.8
+    },
+    "img": {
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "naturalW": 390,
+      "naturalH": 389
+    },
+    "mini": {
+      "top": 844,
+      "bottom": 911.9,
+      "left": 0,
+      "right": 390,
+      "width": 390,
+      "height": 67.9,
+      "justify": "flex-end",
+      "pastFold": true,
+      "inViewport": true
+    },
+    "buttons": [
+      {
+        "label": "Zoom",
+        "aria": "Zoom"
+      },
+      {
+        "label": "Reveal source",
+        "aria": "Reveal source"
+      },
+      {
+        "label": "AR",
+        "aria": "Augmented reality"
+      },
+      {
+        "label": "Share",
+        "aria": "Share"
+      }
+    ]
+  },
+  "liveIcons": {
+    "world-war-one": [
+      "Zoom"
+    ],
+    "world-war-two": [
+      "Zoom"
+    ],
+    "vietnam-war-in-video-stills": [
+      "Zoom"
+    ]
+  }
+}

@@ -14,9 +14,7 @@ interface Props {
 
 export default function ARViewer({ artwork }: Props) {
   const ach = artwork.ach
-  const videos = ach?.arVideos?.length
-    ? ach.arVideos
-    : buildLegacyVideos(artwork)
+  const videos = ach?.arVideos ?? []
 
   const [activeType, setActiveType] = useState<ArVideoType>('making')
   const [timedOut, setTimedOut] = useState(false)
@@ -35,7 +33,7 @@ export default function ARViewer({ artwork }: Props) {
     videoRef.current.play().catch(() => {})
   }, [activeVideo?.videoUrl])
 
-  if (!ach?.arEnabled && !artwork.colorfulFields?.ar) {
+  if (!ach?.arEnabled) {
     return (
       <main className="ar-viewer zone-field pt-28">
         <p>AR is not enabled for this artwork.</p>
@@ -86,7 +84,7 @@ export default function ARViewer({ artwork }: Props) {
       <div className="ar-viewer-controls">
         {(['making', 'history', 'freestyle'] as ArVideoType[]).map((type, index) => {
           const clip = videos.find((entry) => entry.type === type)
-          if (!clip?.videoUrl && !ach?.arEnabled) return null
+          if (!clip?.videoUrl) return null
 
           return (
             <button
@@ -117,15 +115,4 @@ export default function ARViewer({ artwork }: Props) {
       </div>
     </main>
   )
-}
-
-function buildLegacyVideos(artwork: Artwork) {
-  const colorful = artwork.colorfulFields
-  if (!colorful) return []
-
-  return (['making', 'history', 'freestyle'] as ArVideoType[]).map((type) => ({
-    type,
-    videoUrl: colorful[type]?.video?.node?.uri,
-    posterImageUrl: colorful[type]?.poster?.node?.uri,
-  }))
 }

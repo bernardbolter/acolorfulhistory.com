@@ -38,6 +38,7 @@ export interface PayloadKeyHistoricalDate {
   year: number
   event: string
   wikipediaUrl?: string | null
+  wikiLink?: string | null
 }
 
 export interface PayloadArVideo {
@@ -76,6 +77,7 @@ export interface PayloadAchFields {
   keyHistoricalDates?: PayloadKeyHistoricalDate[]
   olderStory?: unknown
   newerStory?: unknown
+  shareDescription?: string
   fieldRecordingUrl?: PayloadMedia | string | null
   transferImage?: PayloadMedia | string | null
   sliderAxis?: 'horizontal' | 'vertical'
@@ -89,7 +91,52 @@ export interface PayloadAchFields {
   availabilityStatus?: 'original-available' | 'sold' | 'prints-only'
 }
 
-export interface PayloadArtworkDocument extends PayloadAchFields {
+/** Nested ACH group as returned by Payload at depth ≥ 0. */
+export interface PayloadAchGroup {
+  hero?: {
+    heroEligible?: boolean
+    heroFields?: Record<string, unknown> | null
+    heroPhoto?: PayloadMedia | string | null
+  }
+  mapAndTour?: {
+    mapPresence?: boolean
+    lat?: number | null
+    lng?: number | null
+    cityPlaceholderColor?: string
+    tourSequence?: number | null
+    grandTour?: boolean
+    grandTourSequence?: number | null
+    tourStopCopy?: unknown
+  }
+  overlay?: {
+    overlayColors?: Array<{ hex?: string } | string>
+    overlayRects?: PayloadOverlayRect[]
+  }
+  sourcePhotograph?: PayloadAchFields
+  sourcePhotographs?: Array<{ sourceImage?: PayloadMedia | string | null; sourceTitle?: string }>
+  location?: PayloadAchFields & {
+    keyHistoricalDates?: Array<{
+      year: number
+      event: string
+      wikiLink?: string
+      wikipediaUrl?: string
+    }>
+  }
+  revealSlider?: {
+    transferImage?: PayloadMedia | string | null
+    sliderAxis?: 'horizontal' | 'vertical'
+  }
+  ar?: PayloadAchFields
+  mop?: {
+    imageCaptureType?: PayloadRelation | string | null
+    imageCaptureLabel?: string
+    triptychPosition?: string
+    availabilityStatus?: 'original-available' | 'sold' | 'prints-only'
+    relatedTriptychs?: unknown[]
+  }
+}
+
+export interface PayloadArtworkDocument extends Omit<PayloadAchFields, 'availabilityStatus'> {
   id: string
   slug: string
   title: string
@@ -101,14 +148,27 @@ export interface PayloadArtworkDocument extends PayloadAchFields {
   country?: string
   orientation?: string
   proportion?: number | null
+  aspectRatio?: number | null
+  availabilityStatus?: string | null
+  seriesSlug?: string | null
+  sizeTier?: 'md' | 'lg' | 'xl' | string | null
+  widthWhole?: number | null
+  heightWhole?: number | null
+  widthMm?: number | null
+  heightMm?: number | null
+  dimensionsDisplay?: string | null
   status?: string
   _status?: 'draft' | 'published'
   exhibitionHistory?: string[]
   primaryImage?: PayloadMedia | string | null
   image?: PayloadMedia | string | null
-  series?: PayloadRelation | { id: string; slug?: string; title?: string } | string | null
+  series?:
+    | PayloadRelation
+    | { id: string; slug?: string; name?: string; title?: string }
+    | string
+    | null
   triptych?: PayloadRelation | { id: string; slug?: string; city?: string } | string | null
-  ach?: PayloadAchFields
+  ach?: PayloadAchGroup
   updatedAt?: string
   createdAt?: string
 }
@@ -141,7 +201,10 @@ export interface PayloadTriptychDocument {
 export interface PayloadSeriesDocument {
   id: string
   slug: string
-  title: string
+  /** Live Payload display field (`useAsTitle: 'name'`). Prefer over `title`. */
+  name?: string
+  /** Legacy / unused on live Series — may be absent. Use `name` via relationName(). */
+  title?: string
   description?: unknown
   period?: string
   cities?: { city?: string }[] | string[]
@@ -175,6 +238,44 @@ export interface PayloadExperiencePageGlobal {
     title?: string
   }[]
   storeLink?: string
+}
+
+/** Global slug: `neighborhood-page` — see docs/SFpainting/neighborhood-payload-schema.md */
+export interface PayloadNeighborhoodSourceImage {
+  id?: string
+  title?: string
+  neighborhood?: string
+  yearLabel?: string
+  image?: PayloadMedia | string | null
+  caption?: string
+  proofUrl?: string
+  proofLabel?: string
+}
+
+export interface PayloadNeighborhoodTier {
+  id?: 'browse' | 'revisited' | 'research' | string
+  title?: string
+  body?: unknown
+  images?: PayloadNeighborhoodSourceImage[]
+}
+
+export interface PayloadNeighborhoodPageGlobal {
+  title?: string
+  kicker?: string
+  introduction?: unknown
+  pitch?: unknown
+  credibility?: unknown
+  tiers?: PayloadNeighborhoodTier[]
+  pricing?: {
+    headline?: string
+    body?: unknown
+    sizeLabel?: string
+    priceLabel?: string
+    batchLabel?: string
+    note?: string
+  }
+  inquiryEmail?: string
+  ctaLabel?: string
 }
 
 export interface PayloadListResponse<T> {

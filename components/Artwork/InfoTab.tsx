@@ -1,130 +1,129 @@
-'use client'
-
-import { useState } from 'react'
-import type { SourcePhotograph } from '@/types/ach'
-import type { ArtworkFields } from '@/types/artwork'
+import Image from 'next/image'
+import { formatMediumLabel } from '@/lib/listCardMeta'
+import type { SourcePhotograph, TriptychPosition } from '@/types/ach'
 
 interface InfoTabProps {
-  fields: ArtworkFields
+  title: string
+  year?: number
+  medium?: string
+  widthCm?: number
+  heightCm?: number
+  seriesName?: string
+  triptychPosition?: TriptychPosition
   source?: SourcePhotograph
 }
 
-export default function InfoTab({ fields, source }: InfoTabProps) {
-  const [active, setActive] = useState<'painting' | 'source'>('painting')
+function seriesLine(seriesName?: string, position?: TriptychPosition) {
+  const series = seriesName?.trim()
+  const panel = position ? `Panel ${position}` : undefined
+  return [series, panel].filter(Boolean).join(' · ')
+}
+
+function sourceCaption(source?: SourcePhotograph) {
+  if (!source) return null
+  const institution = source.sourceInstitution?.trim()
+  const credited = source.sourceCreator?.trim()
+  const photographer = credited || 'photographer unknown'
+  if (institution) return `${institution} — ${photographer}`
+  if (credited) return photographer
+  return null
+}
+
+export default function InfoTab({
+  title,
+  year,
+  medium,
+  widthCm,
+  heightCm,
+  seriesName,
+  triptychPosition,
+  source,
+}: InfoTabProps) {
+  const series = seriesLine(seriesName, triptychPosition)
+  const mediumLabel = formatMediumLabel(medium)
+  const photographer = source?.sourceCreator?.trim() || 'Unknown'
+  const technique =
+    source?.imageCaptureLabel?.trim() || source?.imageCaptureType?.trim()
+  const institution = source?.sourceInstitution?.trim()
+  const caption = sourceCaption(source)
+  const hasImage = Boolean(source?.sourceImageUrl)
+  const dimensions =
+    widthCm && heightCm ? `${widthCm} × ${heightCm} cm` : undefined
 
   return (
-    <div className="info-tab">
-      <div className="info-tab-controls" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={active === 'painting'}
-          className={active === 'painting' ? 'info-tab-active' : ''}
-          onClick={() => setActive('painting')}
-        >
-          Painting
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={active === 'source'}
-          className={active === 'source' ? 'info-tab-active' : ''}
-          onClick={() => setActive('source')}
-        >
-          Source photograph
-        </button>
+    <section className="artwork-info" aria-label="Painting and source">
+      <div className="artwork-info-painting">
+        <h2 className="artwork-info-heading">{title}</h2>
+        <dl className="artwork-info-dl">
+          {year ? (
+            <div className="artwork-info-row">
+              <dt>Year</dt>
+              <dd>{year}</dd>
+            </div>
+          ) : null}
+          {mediumLabel ? (
+            <div className="artwork-info-row">
+              <dt>Medium</dt>
+              <dd>{mediumLabel}</dd>
+            </div>
+          ) : null}
+          {dimensions ? (
+            <div className="artwork-info-row">
+              <dt>Dimensions</dt>
+              <dd>{dimensions}</dd>
+            </div>
+          ) : null}
+          {series ? (
+            <div className="artwork-info-row">
+              <dt>Series</dt>
+              <dd>{series}</dd>
+            </div>
+          ) : null}
+        </dl>
       </div>
 
-      <div className="info-tab-panels">
-        {active === 'painting' ? (
-          <div role="tabpanel" className="info-tab-panel">
-            <dl className="info-tab-dl">
-              {fields.year ? (
-                <>
-                  <dt>Year</dt>
-                  <dd>{fields.year}</dd>
-                </>
-              ) : null}
-              {fields.medium ? (
-                <>
-                  <dt>Medium</dt>
-                  <dd>{fields.medium}</dd>
-                </>
-              ) : null}
-              {fields.width && fields.height ? (
-                <>
-                  <dt>Dimensions</dt>
-                  <dd>
-                    {fields.width} × {fields.height} cm
-                  </dd>
-                </>
-              ) : null}
-              {fields.city && fields.country ? (
-                <>
-                  <dt>Location</dt>
-                  <dd>
-                    {fields.city}, {fields.country}
-                  </dd>
-                </>
-              ) : null}
-            </dl>
-          </div>
+      <div className="artwork-info-source">
+        <h2 className="artwork-info-heading">Source photograph</h2>
+        {hasImage ? (
+          <figure className="artwork-info-figure">
+            <Image
+              src={source!.sourceImageUrl!}
+              alt={
+                source?.sourceImageAltText ||
+                source?.sourceTitle ||
+                'Source photograph'
+              }
+              width={480}
+              height={480}
+              className="artwork-info-thumb"
+              sizes="11rem"
+            />
+            {caption ? (
+              <figcaption className="artwork-info-caption">{caption}</figcaption>
+            ) : null}
+          </figure>
         ) : (
-          <div role="tabpanel" className="info-tab-panel">
-            {source ? (
-              <dl className="info-tab-dl">
-                {source.sourceTitle ? (
-                  <>
-                    <dt>Title</dt>
-                    <dd>{source.sourceTitle}</dd>
-                  </>
-                ) : null}
-                {source.sourceCreator ? (
-                  <>
-                    <dt>Creator</dt>
-                    <dd>{source.sourceCreator}</dd>
-                  </>
-                ) : null}
-                {source.approximateDate ? (
-                  <>
-                    <dt>Date</dt>
-                    <dd>{source.approximateDate}</dd>
-                  </>
-                ) : null}
-                {source.imageCaptureLabel ? (
-                  <>
-                    <dt>Capture</dt>
-                    <dd>{source.imageCaptureLabel}</dd>
-                  </>
-                ) : null}
-                {source.sourceCredit ? (
-                  <>
-                    <dt>Credit</dt>
-                    <dd>{source.sourceCredit}</dd>
-                  </>
-                ) : null}
-                {source.sourceWikimediaCommonsUrl ? (
-                  <>
-                    <dt>Source</dt>
-                    <dd>
-                      <a
-                        href={source.sourceWikimediaCommonsUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline"
-                      >
-                        Wikimedia Commons
-                      </a>
-                    </dd>
-                  </>
-                ) : null}
-              </dl>
-            ) : (
-              <p className="text-text-muted">No source photograph on record.</p>
-            )}
-          </div>
+          <p className="artwork-info-pending">Source photograph pending</p>
         )}
+        <dl className="artwork-info-dl">
+          <div className="artwork-info-row">
+            <dt>Photographer</dt>
+            <dd>{photographer}</dd>
+          </div>
+          {technique ? (
+            <div className="artwork-info-row">
+              <dt>Technique</dt>
+              <dd>{technique}</dd>
+            </div>
+          ) : null}
+          {institution ? (
+            <div className="artwork-info-row">
+              <dt>Institution</dt>
+              <dd>{institution}</dd>
+            </div>
+          ) : null}
+        </dl>
       </div>
-    </div>
+    </section>
   )
 }

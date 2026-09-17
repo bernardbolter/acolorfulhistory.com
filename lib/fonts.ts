@@ -1,4 +1,4 @@
-import { Barlow_Semi_Condensed, Limelight } from 'next/font/google'
+import { Barlow_Semi_Condensed, Josefin_Sans, Limelight } from 'next/font/google'
 
 export const barlow = Barlow_Semi_Condensed({
   subsets: ['latin'],
@@ -11,6 +11,14 @@ export const limelight = Limelight({
   subsets: ['latin'],
   weight: ['400'],
   variable: '--font-limelight',
+  display: 'swap',
+})
+
+/** List card titles only — do not use for page/series Limelight contexts. */
+export const josefin = Josefin_Sans({
+  subsets: ['latin'],
+  weight: ['500', '600'],
+  variable: '--font-josefin',
   display: 'swap',
 })
 

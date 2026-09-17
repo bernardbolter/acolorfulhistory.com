@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { getCityPlaceholderColor } from '@/lib/cityPlaceholder'
 import type { OverlayRect } from '@/types/overlay'
 
@@ -9,6 +9,7 @@ interface ArtworkImagePlaceholderProps {
   color?: string
   overlayRects?: OverlayRect[]
   className?: string
+  style?: CSSProperties
   /** When true, overlay rects dissolve and placeholder can fade. */
   imageLoaded?: boolean
   children?: ReactNode
@@ -19,6 +20,7 @@ export default function ArtworkImagePlaceholder({
   color,
   overlayRects = [],
   className = '',
+  style,
   imageLoaded = false,
   children,
 }: ArtworkImagePlaceholderProps) {
@@ -35,7 +37,7 @@ export default function ArtworkImagePlaceholder({
   return (
     <div
       className={`artwork-image-placeholder ${className}`}
-      style={{ backgroundColor }}
+      style={{ backgroundColor, ...style }}
     >
       {showRects &&
         overlayRects.map((rect, index) => (

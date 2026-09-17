@@ -1,19 +1,11 @@
-import Artworks from '@/components/Artworks/Artworks'
-import SiteChrome from '@/components/Shell/SiteChrome'
-import { getArtworksLite } from '@/lib/data'
+import { redirect } from '@/i18n/routing'
 
 interface Props {
   params: Promise<{ locale: string }>
 }
 
+/** Former series explorer — list lives at `/`, map at `/map`. */
 export default async function SeriesPage({ params }: Props) {
   const { locale } = await params
-  const artworks = await getArtworksLite(locale)
-
-  return (
-    <div>
-      <Artworks artworks={artworks} />
-      <SiteChrome />
-    </div>
-  )
+  redirect({ href: '/', locale })
 }
