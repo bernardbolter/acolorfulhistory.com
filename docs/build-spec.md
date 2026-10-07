@@ -268,6 +268,45 @@ Phase 1 bug, not a future enhancement.
 at all. This confirms §4.4's decision empirically: per-print counting happens in
 Payload, via the webhook, or not at all.
 
+### 4.4b Channels: both, always — and why that stops mattering
+
+**Every product is on `__default_channel__` as well as ACH, permanently.** On create,
+`ChannelService.assignToCurrentChannel` assigns to `[activeChannel, defaultChannel]`
+unconditionally, and `removeProductsFromChannel` refuses to remove from the default
+channel at all (`error.items-cannot-be-removed-from-default-channel`). Core also seeds
+a default-channel `ProductVariantPrice` on every variant because querying without one
+errors. Default-channel membership is an assumption in Vendure, not a setting. Do not
+build anything that depends on channel isolation.
+
+The consequence while tax is live: ACH is `pricesIncludeTax: true` and default is
+`false`, so one stored net price reads as **€35 on ACH and €29.41 on the default
+channel** — two public prices for one object. **The zero-rate tax category fixes this
+as a side effect**: at 0%, `price` and `priceWithTax` are equal and
+`pricesIncludeTax` is irrelevant. So §4.5a item 1 is not only the legal blocker, it is
+also what makes pricing coherent across a channel that cannot be escaped.
+
+Remaining default-channel cleanup is then just deleting the three sample products, so
+nothing public shows a €12,000 placeholder.
+
+**Creating products correctly:** create under a channel-scoped `RequestContext` and
+call no assign method. A context built by `RequestContextService.create()` without a
+`user` has `activeUserId: null` and therefore **zero permissions** — `isAuthorized:
+true` on a synthetic context grants nothing. Any assign or remove call from such a
+context throws `error.forbidden`. Giving a script real permissions means resolving a
+superadmin `User` with `roles` and `roles.channels` loaded and passing it to
+`RequestContextService.create({ user })`.
+
+**How the sample products broke**, for the record: `seed-ach-channel.cjs` called
+`assignProductsToChannel` *before* any variants existed, so it assigned an empty list,
+and then created the variants over admin-api with Bearer auth and **no
+`vendure-token`** — so they landed on the default channel. An ordering bug plus a
+missing header, not a permission failure.
+
+**Soft delete does not free a slug for the idempotency check.** `findOneBySlug`
+filters `deletedAt IS NULL`, so a soft-deleted product reads as absent and a naive
+existence check will happily create a second product with the same slug. Any create
+script must query with `withDeleted: true`.
+
 ### 4.5a Launch blockers on the commerce side
 
 Three, none of which are code in this repo:
@@ -278,6 +317,10 @@ Three, none of which are code in this repo:
    tax statement on an invoice can create liability for the amount shown. Needs a
    zero-rate tax category and the §19 note on the invoice template. Tax rates are
    database entities, so this is Admin UI work — and a Steuerberater question first.
+   **Demonstrated live, 17 Sep 2026:** a variant created at `price: 100` came back
+   from shop-api as `price: 84` — 100 ÷ 1.19. The rate is not theoretical, it is
+   already rewriting prices. Fixing it also resolves the dual-channel price split in
+   §4.4b, so this one action clears two problems.
 2. **The ACH channel has no shipping method.** `activeShippingMethods: []`. The one
    existing zero-rate method belongs to the default channel and has `code: ""`. Make
    a properly-coded zero-rate method for ACH rather than reusing it.
@@ -442,13 +485,16 @@ functions are the only gate** and they are what must be trusted. And
 `JSON.stringify` on the way in while the webhook parses on the way out. Stringify
 twice and you get a quoted string that parses back to a string rather than an array.
 
-**Validation is confirmed working** — exactly-five enforced in both directions, invalid
-JSON rejected, and per-object field checking real (`selectionSnapshot[2].title must be
-a non-empty string`). **Line-merge behaviour is still unverified**: the merge cases
-never ran, because no variant exists on the ACH channel. Whether two identical
-selections merge to quantity 2 or stay two lines decides how the picker handles a
-second packet and what `quantitySold` means in the webhook. Test it against a
-disposable product before building the storefront.
+**Verified end to end against the live instance, 17 Sep 2026** — all nine cases pass.
+Validation enforces exactly five in both directions, rejects invalid JSON, and checks
+per-object fields (`selectionSnapshot[2].title must be a non-empty string`).
+
+**Line-merge behaviour, measured:** two *different* selections on the same variant
+produce **two order lines**; two *identical* selections produce **one line at quantity
+2**. So the consumer rule is: **for each line, increment each print in `selectionIds`
+by that line's `quantitySold`** — not by 1, and not once per order. Getting this wrong
+undercounts a double order by half. The picker UI should likewise show a quantity
+rather than two identical rows.
 
 **Which collection this is.** The packet prints from **finished square paintings** —
 the ~80 works — not from the unmade photograph pool in §5.4, which feeds commissions.
@@ -625,7 +671,19 @@ change only when a phase says to change them.
 
 Eight phases. One task, one branch, one gate.
 
-### Phase 0 — Fix and clear
+### Phase 0 — Fix and clear · **DONE 17 Sep 2026**, branch `phase-0-fix-and-clear`
+
+All eight fixes applied and fourteen files deleted — the twelve dormant ones plus
+`lib/placeholders.ts` and `lib/placeholders.server.ts`, which only became dead once
+the blur props were removed. Side benefit: `getArtworkBlurDataURL` was running a
+synchronous CRC32 + `zlib.deflateSync` PNG encode per artwork inside
+`mapPayloadArtworkForList`, on every list fetch across ~79 records. Gone from the
+request path.
+
+Four availability bugs were found along the way — see §10a-bis. Lint baseline
+established at 11 errors / 7 warnings on `main`, unchanged by the phase.
+
+
 Everything in `CLAUDE.md`'s known-broken table. Remove `PREVIEW_ALL_MINI_NAV`; fix
 the depth-1/full-mapper mismatch and the allowlist bypass in
 `getTriptychPanelsForArtwork`; remove the blur placeholders and the CSS at
@@ -711,6 +769,77 @@ configurator.
 
 The artwork page thinning (§3.3) can go anywhere after Phase 0. It is small and
 independent.
+
+---
+
+## 10a-bis. The availability model — found during Phase 0, 17 Sep 2026
+
+Phase 0 was specified as eight line-numbered fixes. Four of them acted as probes and
+turned up bugs no audit had found, because the audits read code while these were only
+visible once the code was touched. Recorded here because the remaining items are
+Phase 1 work.
+
+### Two fields, two enums, and one broken bridge
+
+| Field | Values |
+|---|---|
+| `doc.availabilityStatus` (archive-wide) | `available` · `sold` · `not-for-sale` · `on-loan` |
+| `doc.ach.mop.availabilityStatus` | `original-available` · `sold` · `prints-only` |
+
+`buildArtworkFields` derives `forsale` from `raw.availabilityStatus ===
+'original-available'`, where `raw = mergeAchFields(doc)` — a shallow
+`{...doc, ...doc.ach}`. The field actually lives at `doc.ach.mop.availabilityStatus`,
+so the shallow spread never reaches it and `raw.availabilityStatus` resolves to the
+*archive* field, compared against a string from the *MoP* enum. **It has never
+matched: `forsale` is false for all 220 records.** Nothing reads it today, so it is
+dormant — but Phase 6 will.
+
+**Fix it in Phase 1, and not in the mapper.** `lib/unifiedAvailability.ts` exists to
+reconcile these two layers into one answer; `buildArtworkFields` doing its own
+comparison duplicates that job badly enough to have been wrong for months. Derive
+`forsale` from `getUnifiedAvailability`, at the commerce boundary where it belongs.
+
+### What was live and wrong
+
+`ARCHIVE_SOLD_STATUSES` contained `sold`, `not-for-sale`, `on-loan`, `reserved` and
+`on-consignment`, and everything in it resolved to `'sold'`. With **13 of 79** site
+records marked `not-for-sale` (117 of 220 archive-wide), paintings Bernard still owns
+were telling visitors they had sold — in the artwork-page badge, which is live, not
+just in the dormant filter path.
+
+Fixed in Phase 0: `not-for-sale` and `on-loan` now have their own branches and labels
+in both `resolveUnifiedAvailability` and `getStatusBadgeAvailability`, the
+`UnifiedAvailability` union was widened to carry them, and the badge was moved onto
+`next-intl` — it had been hardcoded English on an EN/DE site since it was written.
+
+### The structural fix, for Phase 1
+
+`reserved` and `on-consignment` remain in the Set and would read as "Sold" the day
+they appear. A reserved work is held for someone and still owned; a consigned work is
+sitting in a gallery. That is the same bug a fourth time.
+
+**Three rounds of special-casing means the abstraction is inverted.** A Set named
+`ARCHIVE_SOLD_STATUSES` treats sold as the default and every other state as an
+exception, when only `sold` means sold. Replace it with an exhaustive
+`Record<ArchiveStatus, UnifiedAvailability>` — the shape `StatusBadge`'s
+`STATUS_KEYS` now has — so a new status fails the typecheck until someone gives it a
+deliberate answer instead of silently becoming a false claim.
+
+This also settles a smaller question rather than leaving it open. The two functions'
+fallthroughs now differ: `resolveUnifiedAvailability` must return a union member so it
+buckets an unknown status as `not-for-sale`, while `getStatusBadgeAvailability` can
+return `undefined` and claim nothing. Both are the best choice each signature allows,
+so it is not two policies disagreeing — and the exhaustive Record makes both
+fallthroughs unreachable by construction. Don't pick a fallthrough policy; remove the
+need for one.
+
+### Check this on bernardbolter.com
+
+**117 of 220 archive records are `not-for-sale`.** If that site shares this resolution
+logic against the same Payload fields, over half its catalogue may be displaying as
+sold — nine times the ACH problem, on the site that is meant to be the authoritative
+record. And it would be wrong *inside* the JSON-LD, not only in the rendered page.
+Worth checking before the JSON-LD work there, not after.
 
 ---
 

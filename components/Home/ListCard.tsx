@@ -4,7 +4,6 @@ import type { CSSProperties } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import PaintingListMeta from '@/components/Home/PaintingListMeta'
-import { FALLBACK_BLUR_DATA_URL } from '@/lib/placeholders'
 import {
   listImageOrientationClass,
   listImageStyleVars,
@@ -24,7 +23,6 @@ export default function ListCard({ artwork, priority, isHeroSlot }: ListCardProp
   const aspectRatio = resolveListAspectRatio(artwork.aspectRatio)
   const orientationClass = listImageOrientationClass(artwork.artworkFields.orientation)
   const imageStyleVars = listImageStyleVars(artwork)
-  const blurDataURL = artwork.placeholderBlurDataURL ?? FALLBACK_BLUR_DATA_URL
 
   return (
     <article
@@ -50,8 +48,6 @@ export default function ListCard({ artwork, priority, isHeroSlot }: ListCardProp
               fill
               className="object-contain"
               sizes="(min-width: 769px) 100vw, 100vw"
-              placeholder="blur"
-              blurDataURL={blurDataURL}
               priority={priority}
             />
           )}

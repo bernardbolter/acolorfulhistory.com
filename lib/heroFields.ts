@@ -15,20 +15,12 @@ export const HERO_POOL_SLUGS = [
 export type HeroPoolSlug = (typeof HERO_POOL_SLUGS)[number]
 
 /**
- * In-code lock to one tuning slug. Only honored when `HERO_DEV_FALLBACK_SLUG`
- * is set in the environment — never a production default on its own.
- * Keep `null` in committed code.
- */
-export const HERO_FORCE_SLUG: HeroPoolSlug | null = null
-
-/**
  * Opt-in local hero path. Unset in production → CMS `heroEligible` pool only.
  * Values: a Payload slug, or `random` / `true` / `1` to pick from HERO_POOL_SLUGS.
  */
 export function resolveHeroDevFallbackSlug(): string | null {
   const env = process.env.HERO_DEV_FALLBACK_SLUG?.trim()
   if (!env) return null
-  if (HERO_FORCE_SLUG) return HERO_FORCE_SLUG
   const normalized = env.toLowerCase()
   if (normalized === 'random' || normalized === 'true' || normalized === '1') {
     return pickRandomHeroPoolSlug()
@@ -57,7 +49,6 @@ const LOCAL_HERO_FIELDS: Record<HeroFieldsJsonSlug, unknown> = {
 
 /** Used only when `HERO_DEV_FALLBACK_SLUG` enables the local path. */
 export function pickRandomHeroPoolSlug(): string {
-  if (HERO_FORCE_SLUG) return HERO_FORCE_SLUG
   const index = Math.floor(Math.random() * HERO_POOL_SLUGS.length)
   return HERO_POOL_SLUGS[index]
 }

@@ -1,5 +1,5 @@
 import { getCityPlaceholderColor } from '@/lib/cityPlaceholder'
-import { getArtworkBlurDataURL } from '@/lib/placeholders.server'
+import { getUnifiedAvailabilityFromDoc } from '@/lib/unifiedAvailability'
 import { payloadRichTextToHtml, payloadRichTextToPlain } from '@/lib/mappers/richText'
 import { parseHeroFieldsData } from '@/lib/heroFields'
 import {
@@ -189,7 +189,7 @@ function buildArtworkFields(
     country: raw.country || '',
     lat: raw.lat ?? 0,
     lng: raw.lng ?? 0,
-    forsale: raw.availabilityStatus === 'original-available',
+    forsale: getUnifiedAvailabilityFromDoc(raw) === 'available',
     height,
     width,
     year: raw.year ?? raw.yearCreated ?? 0,
@@ -330,11 +330,6 @@ export function mapPayloadArtworkForList(
     widthCm,
     heightCm,
     primaryImageUrl: imageUrl,
-    placeholderBlurDataURL: getArtworkBlurDataURL(
-      overlayColors,
-      mapAndTour?.cityPlaceholderColor,
-      doc.city
-    ),
     yearCreated: doc.yearCreated ?? doc.year ?? undefined,
     availabilityStatus: doc.availabilityStatus ?? undefined,
     seriesSlug:
@@ -347,7 +342,7 @@ export function mapPayloadArtworkForList(
       country: doc.country || '',
       lat: mapAndTour?.lat ?? doc.lat ?? 0,
       lng: mapAndTour?.lng ?? doc.lng ?? 0,
-      forsale: false,
+      forsale: getUnifiedAvailabilityFromDoc(doc) === 'available',
       height: heightCm ?? height ?? 0,
       width: widthCm ?? width ?? 0,
       year: doc.yearCreated ?? doc.year ?? 0,

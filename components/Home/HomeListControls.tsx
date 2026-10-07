@@ -23,6 +23,10 @@ function availabilityLabelKey(value: UnifiedAvailability): string {
       return 'availabilityAvailable'
     case 'sold':
       return 'availabilitySold'
+    case 'not-for-sale':
+      return 'availabilityNotForSale'
+    case 'on-loan':
+      return 'availabilityOnLoan'
     case 'prints-only':
       return 'availabilityPrintsOnly'
   }

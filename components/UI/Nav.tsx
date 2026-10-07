@@ -33,9 +33,6 @@ const NAV_GROUPS: NavGroup[] = [
     labelKey: 'series',
     links: [
       { href: '/series/mediums-of-perception', labelKey: 'mediumsOfPerception' },
-      { href: '#', labelKey: 'breakingDownArt' },
-      { href: '#', labelKey: 'theGatesOfPerception' },
-      { href: '#', labelKey: 'mediumsOfWar' },
     ],
   },
   {

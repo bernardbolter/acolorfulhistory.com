@@ -1745,11 +1745,6 @@ body {
   text-align: right;
 }
 
-/* Next.js blur placeholder — flat color, no gaussian blur artefact */
-.painting-list-image--blur > span {
-  filter: none !important;
-}
-
 .painting-list-image--blur img {
   object-fit: contain;
 }

@@ -16,7 +16,6 @@ import {
   HERO_CHOREOGRAPHY,
   photoRectStyle,
 } from '@/components/Home/hero-timeline'
-import { FALLBACK_BLUR_DATA_URL } from '@/lib/placeholders'
 import { resolveHeroAnimationPayload } from '@/lib/heroFields'
 import {
   listImageOrientationClass,
@@ -103,7 +102,6 @@ export default function HeroListItem({ artwork }: HeroListItemProps) {
   const orientationClass = listImageOrientationClass(
     artwork.artworkFields.orientation
   )
-  const blurDataURL = artwork.placeholderBlurDataURL ?? FALLBACK_BLUR_DATA_URL
   const placeYear = placeYearLabel(artwork)
   const photoUrl = hero?.photoUrl
   const useGrayscaleFallback = Boolean(hero && !photoUrl)
@@ -360,8 +358,6 @@ export default function HeroListItem({ artwork }: HeroListItemProps) {
                 fill
                 className="object-cover"
                 sizes="100vw"
-                placeholder="blur"
-                blurDataURL={blurDataURL}
                 priority
               />
             </div>

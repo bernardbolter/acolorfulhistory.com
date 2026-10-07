@@ -1,14 +1,19 @@
+import { useTranslations } from 'next-intl'
 import type { AchAvailabilityStatus } from '@/types/ach'
 import { pickAccentColor } from '@/helpers/seededRandom'
 
-const LABELS: Record<AchAvailabilityStatus, string> = {
-  'original-available': 'Original available',
-  sold: 'Sold',
-  'prints-only': 'Prints only',
+type BadgeStatus = AchAvailabilityStatus | 'not-for-sale' | 'on-loan'
+
+const STATUS_KEYS: Record<BadgeStatus, string> = {
+  'original-available': 'availabilityAvailable',
+  sold: 'availabilitySold',
+  'prints-only': 'availabilityPrintsOnly',
+  'not-for-sale': 'availabilityNotForSale',
+  'on-loan': 'availabilityOnLoan',
 }
 
 interface StatusBadgeProps {
-  status?: AchAvailabilityStatus
+  status?: BadgeStatus
   slug: string
   overlayColors?: string[]
 }
@@ -18,13 +23,15 @@ export default function StatusBadge({
   slug,
   overlayColors,
 }: StatusBadgeProps) {
+  const t = useTranslations()
+
   if (!status) return null
 
   const accent = pickAccentColor(slug, overlayColors) || 'var(--ui-fault-heavy)'
 
   return (
     <span className="status-badge" style={{ borderColor: accent, color: accent }}>
-      {LABELS[status]}
+      {t(STATUS_KEYS[status])}
     </span>
   )
 }
