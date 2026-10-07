@@ -825,6 +825,14 @@ exception, when only `sold` means sold. Replace it with an exhaustive
 `STATUS_KEYS` now has — so a new status fails the typecheck until someone gives it a
 deliberate answer instead of silently becoming a false claim.
 
+This also settles a smaller question rather than leaving it open. The two functions'
+fallthroughs now differ: `resolveUnifiedAvailability` must return a union member so it
+buckets an unknown status as `not-for-sale`, while `getStatusBadgeAvailability` can
+return `undefined` and claim nothing. Both are the best choice each signature allows,
+so it is not two policies disagreeing — and the exhaustive Record makes both
+fallthroughs unreachable by construction. Don't pick a fallthrough policy; remove the
+need for one.
+
 ### Check this on bernardbolter.com
 
 **117 of 220 archive records are `not-for-sale`.** If that site shares this resolution
