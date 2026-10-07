@@ -23,6 +23,25 @@ that one is product intent — the route map, the three products, the commerce
 boundary, and eight phased tasks each with an acceptance gate. Read it before
 starting any feature work. Its §12 is a stop list.
 
+## Build status
+
+Current as of merge `f08d324` on `main` (Phase 0 + 0b). Gates live in
+`docs/build-spec.md` §10 (Phase 0b / availability structural fix under §10a-bis).
+
+| Phase | Status |
+|---|---|
+| Phase 0 — Fix and clear | DONE |
+| Phase 0b — Exhaustive `ARCHIVE_STATUS_MAP` + `forsale` from unified availability | DONE |
+| Phase 1 — Commerce boundary | NOT STARTED |
+| Phase 2 — Studio periods | NOT STARTED |
+| Phase 3 — `/paintings` and the filter bar | NOT STARTED |
+| Phase 4 — `/commissions` | NOT STARTED |
+| Phase 5 — Homepage restructure | NOT STARTED |
+| Phase 6 — The print packet | NOT STARTED |
+| Phase 7 — The configurator | NOT STARTED |
+| Phase 8 — Map filters | NOT STARTED |
+| Artwork-page thinning (§3.3) | NOT STARTED |
+
 ## Commands
 
 ```
@@ -57,7 +76,6 @@ These are not preferences. Breaking one is a bug.
   Currently clean — zero occurrences. Keep it that way.
 - **Font sizes in rem, never px.** Currently clean.
 - **No blur placeholders.** Use `cityPlaceholderColor` + `overlayRects`.
-  *Currently violated* — see Known-broken below.
 - **Never `react-medium-image-zoom`.** Zoom is `components/Artwork/ZoomMode.tsx`.
 - **Never rebuild the logo wordmark in HTML/CSS.** It is SVG: `svgs/colorLogo.js`,
   used by `components/UI/Logo.tsx:28`. (The tagline and byline *are* HTML — that is
@@ -79,54 +97,51 @@ These are not preferences. Breaking one is a bug.
   Payload's `published` status, which is archive-wide across all of Bernard's sites
   (~217 works). A series appears on this site only if its slug is in that list.
   See `docs/artwork/decision-keep-site-series-allowlist.md`.
-- **Every artwork query must route through `buildSiteSeriesWhereParams`.** Two
-  currently do not — see Known-broken.
+- **Every artwork query must route through `buildSiteSeriesWhereParams`.** The
+  triptych sibling query (`getTriptychPanelsForArtwork`) does so as of `fc064c8`.
+  The remaining thing to check is the opt-in `HERO_DEV_FALLBACK_SLUG` env path in
+  `lib/heroFields.ts` — production leaves it unset.
 - **Fetch depth must match the mapper being used.** `mapPayloadArtworkForList`
   needs depth 1; `mapPayloadArtworkToArtwork` needs depth 2 (AR poster images are a
   relation inside an array). Mismatches are silent data loss, not just waste.
+- **`forsale` is derived from `getUnifiedAvailabilityFromDoc`** and is true for
+  19 of 79 site records. Nothing may treat it as "has a buy button" — commissions,
+  not inventory, are the business.
 
 ---
 
 ## Known-broken — fix, do not preserve
 
 An agentic pass will find these and may assume they are intentional. They are not.
+Verified still true by Audit 4 (`docs/artwork/addendum-build-state-oct2026.md`).
 
 | Where | What |
 |---|---|
-| `components/Artwork/ArtworkPage.tsx:38` | `PREVIEW_ALL_MINI_NAV = true` forces every MiniNav icon on regardless of data. Visitors get an AR icon with no AR, a slider with no transfer image, a share with no `shareDescription`. Lines 129–132 have unreachable right-hand gates because of it. |
-| `lib/data.ts` `getTriptychPanelsForArtwork` (~137–148) | Fetches depth 1 but runs the **full** mapper, which needs depth 2. Nested AR media comes back unpopulated. Also the only artwork query besides the hero dev path that bypasses `buildSiteSeriesWhereParams` — it filters by the artwork's own `series.slug` instead, which will leak works from series not on the allowlist. |
-| `components/Home/ListCard.tsx:27,53–54` · `components/Home/HeroListItem.tsx:106,363–364` | `placeholder="blur"` with a 1×1 `blurDataURL`, against the never-blur rule, with CSS at `globals.css:1748–1751` trying to suppress the gaussian. Two placeholder mechanisms fighting. |
-| `lib/heroFields.ts:22,31,60` | `HERO_FORCE_SLUG = null` with unreachable branches behind it. |
-| `components/Home/hero-timeline.ts:70` | `ENABLE_HERO_UNPAINT_ON_EXIT = false`, exported, read nowhere. |
-| `components/UI/Nav.tsx:36–38` | Three nav entries with `href: '#'` — Breaking Down Art, Gates of Perception, Mediums of War. Links that do not navigate. |
+| Lint baseline | **11 errors / 7 warnings** on `main`. New work must not exceed that count. Comparative check only — never report lint as "clean." |
+| `app/[locale]/series/page.tsx` | Redirects to `/`. Spec target is `/paintings` (Phase 3; not yet built). |
+| `/neighborhood` | Still the live commissions URL. No redirect to `/commissions` (Phase 4; route not yet renamed). |
+| `components/Artwork/ArtworkPage.tsx` | Still renders `StoryColumns`; archive link is always shown (ungated). Thinning is §3.3 / not started. |
+| `lib/siteSeries.ts` `SITE_SERIES_SLUGS` | Still admits Mediums of War (`world-war-one`, `world-war-two`, `vietnam-war-in-video-stills`). Build-spec §1 site split is not yet applied. |
+| `lib/vendure.ts` | Sends no `vendure-token` header for the `a-colorful-history` channel. |
 
 ---
 
 ## Live vs dead — read this before editing anything
 
-There are **two hero implementations** and one is dead. Eleven files are dormant.
+**The live hero** is `components/Home/HeroListItem.tsx` with
+`components/Home/hero-timeline.ts`. It is the self-painting slot-0 hero on the
+homepage list, driven by `ach.hero.heroFields` polygon data. That choreography
+took eight briefs — **do not edit it** unless a phase explicitly says to.
 
-**The live hero** is `components/Home/HeroListItem.tsx` (405 lines) with
-`components/Home/hero-timeline.ts` (360 lines). It is the self-painting slot-0 hero
-on the homepage list, driven by `ach.hero.heroFields` polygon data.
+The old `components/hero/` stack and the other dormant Artworks/Landing/Loader
+files were deleted in Phase 0 (`fc064c8`).
 
-**Dead — imported by nothing:**
-`components/Artworks/Artworks.tsx` · `components/Home/HomeListControls.tsx` ·
-`components/Pages/LandingPage.tsx`
-
-**Dead — only reachable through the above:**
-`components/Artworks/ArtworkList.tsx` · `components/UI/Loader.tsx` ·
-`components/Home/HomeSectionRenderer.tsx` · and the entire old hero stack:
-`components/hero/HeroSection.tsx`, `HeroSectionLoader.tsx`, `HeroCanvas.tsx`,
-`HeroCopy.tsx`, `HeroMobileArrow.tsx`, `hero-states.ts`, `hero-timeline.ts`
-
-**`HomeListControls.tsx` is a complete, working filter bar that is imported
-nowhere** — `PaintingList.tsx:34` has only a comment where it used to render. Its
-styles (`globals.css:1634–1674`) and its data layer (`getHomepageFacets` in
-`lib/homepageArtworks.ts:227`) are also live-but-unused. Switching it back on was a
-deliberate decision rather than a repair — **and the decision has now been made**:
-it gets mounted on the new `/paintings` route in Phase 3 of `docs/build-spec.md`.
-Do not mount it anywhere else, and do not mount it on `/`.
+**Only `components/Home/HomeListControls.tsx` remains dormant**, deliberately —
+a complete filter bar imported nowhere (`PaintingList.tsx:34` is a comment). Its
+styles (`globals.css:1634–1674`) and data layer (`getHomepageFacets` in
+`lib/homepageArtworks.ts:227`) are live-but-unused. It mounts on `/paintings` in
+Phase 3 of `docs/build-spec.md`. Do not mount it anywhere else, and do not mount
+it on `/`.
 
 Fourteen other `lib/` and `helpers/` exports are called nowhere; the inventory
 lists them with line numbers.
